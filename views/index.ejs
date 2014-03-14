@@ -2,10 +2,32 @@
 <html>
 <head>
 <title><%= title %></title>
-<link rel='stylesheet' href='/stylesheets/style.css' />
+<link rel='stylesheet' type='text/css' href='https://fonts.googleapis.com/css?family=Duru+Sans'>
+<link rel='stylesheet' type='text/css' href='/about_me/css/style.css'>
+<script type='text/javascript' src='/about_me/js/jquery-1.9.1.min.js'></script>
+<script type='text/javascript' src='/about_me/js/script.js'></script>
 </head>
 <body>
-<h1><%= title %></h1>
-<p>Welcome to <%= title %></p>
+
+<div class="fb-login-button"
+    data-scope="email, user_birthday, user_friends"
+    data-max-rows="1" data-size="large"
+    data-show-faces="true" data-auto-logout-link="true"></div>
+
+<div class='event'></div>
+
+<div>
+<table>
+<tr>
+<td><input type='text' class='title'></td>
+<td><input type='text' class='location'></td>
+<td><button onclick='saveEvent();'>save</button>
+</tr>
+</table>
+</div>
+
+<script type="text/javascript">
+$(document).ready(mainPage);
+</script>
 </body>
 </html>
