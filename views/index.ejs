@@ -3,14 +3,16 @@
 <head>
 <title><%= title %></title>
 <link rel='stylesheet' type='text/css' href='https://fonts.googleapis.com/css?family=Duru+Sans'>
-<link rel='stylesheet' type='text/css' href='/about_me/css/style.css'>
-<script type='text/javascript' src='/about_me/js/jquery-1.9.1.min.js'></script>
-<script type='text/javascript' src='/about_me/js/script.js'></script>
+<link rel='stylesheet' type='text/css' href='/css/style.css'>
+<script type='text/javascript' src="/socket.io/socket.io.js"></script>
+<script type='text/javascript' src='/js/jquery-1.9.1.min.js'></script>
+<script type='text/javascript' src='/js/moment.min.js'></script>
+<script type='text/javascript' src='/js/script.js'></script>
 </head>
 <body>
 
 <div class="fb-login-button"
-    data-scope="email, user_birthday, user_friends"
+    data-scope="email, user_birthday, user_friends, publish_actions"
     data-max-rows="1" data-size="large"
     data-show-faces="true" data-auto-logout-link="true"></div>
 
@@ -21,13 +23,19 @@
 <tr>
 <td><input type='text' class='title'></td>
 <td><input type='text' class='location'></td>
-<td><button onclick='saveEvent();'>save</button>
+<td>
 </tr>
 </table>
 </div>
 
+<div>
+<input type='text' class='chat_message'>
+<button onclick='aboutme.chat();'>send</button>
+</div>
+<div class='chat_history'></div>
+
 <script type="text/javascript">
-$(document).ready(mainPage);
+$(document).ready(aboutme.main);
 </script>
 </body>
 </html>
