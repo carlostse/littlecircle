@@ -27,26 +27,44 @@ if ('development' == app.get('env')) {
     app.use(express.errorHandler());
 }
 
-app.get('/', routes.index);
+app.get('/main', routes.index);
 app.get('/event/create', event.actionCreate);
 app.get('/event/query', event.actionQuery);
 
-
-var io = require('socket.io').listen(app.listen(port));
+var io = require('socket.io').listen(app.listen(port), {log: false});
 console.log('Express server listening on port ' + port);
+
+var online = {
+    users: [],
+    addUser: function(name) {
+        for (var i = 0; i < online.users.length; i++) {
+            if (online.users[i] === name) {
+                return;
+            }
+        }
+        online.users.push(name);
+    }
+};
 
 io.sockets.on('connection', function (socket) {
     console.log('socket connected');
     //socket.emit('message', {cmd: 1, message: 'welcome to the chat'});
 
     socket.on('online', function (data) {
-        console.log('online: ' + data);
-        if (data && data.name)
-            io.sockets.emit('message', data.name + ' is online');
+        console.log('new online: ' + JSON.stringify(data));
+        if (data && data.name){
+            var name = data.name;
+            online.addUser(name);
+            io.sockets.emit('message', name + ' is online');
+            console.log('current online: ' + JSON.stringify(online.users));
+        }
     });
     socket.on('chat', function (data) {
         console.log('chat: ' + JSON.stringify(data));
         if (data && data.user && data.message)
             io.sockets.emit('message', data.user.name + ': ' + data.message);
+    });
+    socket.on('disconnect', function() {
+        console.log('someone disconnect');
     });
 });
