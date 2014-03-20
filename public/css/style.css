@@ -1,4 +1,7 @@
 body {
-	padding: 50px;
-  	font: 14px 'Duru Sans', sans-serif;
+    padding: 50px;
+    font: 14px 'Duru Sans', sans-serif;
+}
+.main_banner {
+    vertical-align: center;
 }

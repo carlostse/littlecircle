@@ -240,7 +240,7 @@ var aboutme = {
     },
     pushPost: function(event){
         console.log('push post to facebook');
-        var msg = aboutme.user.name() + ' is ' + event.title + ' at ' + event.location;
+        var msg = aboutme.user.name + ' is ' + event.title + ' at ' + event.location;
         FB.api('/me/feed', 'post', {message: msg}, function(response){
             if (!response || response.error){
                 console.log('[pushPost] error: ' + JSON.stringify(response.error));
