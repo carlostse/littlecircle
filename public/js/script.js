@@ -318,9 +318,10 @@ var aboutme = {
                 alert(['Your request cannot be processed, please try again later.<br>Ref. #' + 500]);
                 return;
             }
-            $('div.gallery').append(
-                '<a href="/gapp/view?id=' + data + '&full=1" target="_blank"><img src="/gapp/view?id=' + data + '"></a>'
-            );
+            // append photo
+            $('div.gallery').append(aboutme.photo.getPhotoLink(data, aboutme.photo.num));
+            aboutme.photo.initFancyBox(aboutme.photo.num++);
+            
             // get new upload URL
             aboutme.upload.prepare();
         },
@@ -330,6 +331,7 @@ var aboutme = {
         }
     },
     photo: {
+        num: 0,
         search: function(data){
             $.ajax({
                 type: "GET",
@@ -341,10 +343,19 @@ var aboutme = {
                 }
                 var div = $('div.gallery');
                 data.forEach(function(o){
-                    div.append(
-                        '<a href="/gapp/view?id=' + o.pkey + '&full=1" target="_blank"><img src="/gapp/view?id=' + o.pkey + '"></a>'
-                    );
+                    div.append(aboutme.photo.getPhotoLink(o.pkey, aboutme.photo.num));
+                    aboutme.photo.initFancyBox(aboutme.photo.num++);
                 });
+            });
+        },
+        getPhotoLink: function(id, index){
+            return '<a id="img_' + index + '" href="/gapp/view?id=' + id + '&full=1"><img src="/gapp/view?id=' + id + '"></a>';
+        },
+        initFancyBox: function(index){
+            $('a#img_' + index).fancybox({
+                'type'          : 'image',
+                'transitionIn'  : 'elastic',
+                'transitionOut' : 'fade'
             });
         }
     }

@@ -101,6 +101,7 @@ class ImageDownloadHandler(blobstore_handlers.BlobstoreDownloadHandler):
         #img.resize(width=200, height=200)
         #thumbnail = img.execute_transforms(output_encoding=images.JPEG)
 
+        self.response.headers['Content-Type'] = 'image/jpeg'
         self.send_blob(blob_info)
 
 app = webapp2.WSGIApplication([
