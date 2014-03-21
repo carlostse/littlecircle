@@ -1,3 +1,6 @@
 node_modules
 thumb.db
 .?*
+*.sqlite
+*.pyc
+gapp/index.yaml

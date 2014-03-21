@@ -136,6 +136,9 @@ var aboutme = {
             FB.getLoginStatus(facebook.loginCallback('main'));
         });
 
+        // prepare upload photo
+        aboutme.upload.prepare();
+        
         // web socket
         var socket = 'http://' + aboutme.domain + ':' + aboutme.socketPort;
         console.log('connect ' + socket);
@@ -152,6 +155,8 @@ var aboutme = {
             alert('emit offline: ' + JSON.stringify(aboutme.user));
         });
         */
+        // load photo
+        aboutme.photo.search({ event: '1'});
     },
     chat: function(){
         var msg = $('input.chat_message').val();
@@ -236,7 +241,6 @@ var aboutme = {
             location.val(null);
             aboutme.loadEvent();
         });
-
     },
     pushPost: function(event){
         console.log('push post to facebook');
@@ -248,5 +252,100 @@ var aboutme = {
                 console.log('[pushPost] success');
             }
         });
+    },
+    upload: {
+        url: '',
+        action: function(){
+            confirm('are you sure');
+            var formData = new FormData($('form.form_upload')[0]);
+            $.ajax({
+                url: aboutme.upload.url,
+                type: 'POST',
+                xhr: function() {  
+                    // Custom XMLHttpRequest
+                    var myXhr = $.ajaxSettings.xhr();
+                    // Check if upload property exists
+                    if (myXhr.upload){ 
+                        // For handling the progress of the upload
+                        myXhr.upload.addEventListener('progress', aboutme.upload.progressCallback, false); 
+                    }
+                    return myXhr;
+                },
+                // events
+                // beforeSend: null,
+                success: aboutme.upload.successCallback,
+                error: aboutme.upload.errorCallback,
+                // Form data
+                data: formData,
+                // Options to tell jQuery not to process data or worry about content-type.
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+        },
+        prepare: function(){
+            var form = $('form.form_upload');
+            form.hide();
+            $.ajax({
+                type: "GET",
+                url: '/gapp/upload_url'
+            }).done(function(data){
+                if (!data){
+                    alert(['Your request cannot be processed, please try again later.<br>Ref. #' + 500]);
+                    return;
+                }
+                aboutme.upload.url = data;
+                form.show();
+            });
+        },
+        validate: function(){
+            /*
+            $(':file').change(function(){
+                var file = this.files[0];
+                var name = file.name;
+                var size = file.size;
+                var type = file.type;
+                alert(name);
+            });
+            */
+        },
+        progressCallback: function(e){
+            //if (e.lengthComputable)
+            //    $('progress').attr({value:e.loaded,max:e.total});
+        },
+        successCallback: function (data){
+            if (!data){
+                alert(['Your request cannot be processed, please try again later.<br>Ref. #' + 500]);
+                return;
+            }
+            $('div.gallery').append(
+                '<a href="/gapp/view?id=' + data + '&full=1" target="_blank"><img src="/gapp/view?id=' + data + '"></a>'
+            );
+            // get new upload URL
+            aboutme.upload.prepare();
+        },
+        errorCallback: function (error){
+            //alert('errorHandler: ' + JSON.stringify(error));
+            alert(['Your request cannot be processed, please try again later.<br>Ref. #' + 500]);
+        }
+    },
+    photo: {
+        search: function(data){
+            $.ajax({
+                type: "GET",
+                url: '/gapp/search',
+                data: data
+            }).done(function(data){
+                if (!data || data.length < 1){
+                    return;
+                }
+                var div = $('div.gallery');
+                data.forEach(function(o){
+                    div.append(
+                        '<a href="/gapp/view?id=' + o.pkey + '&full=1" target="_blank"><img src="/gapp/view?id=' + o.pkey + '"></a>'
+                    );
+                });
+            });
+        }
     }
 };

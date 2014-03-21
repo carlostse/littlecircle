@@ -12,28 +12,39 @@
 <body>
 
 <div class="fb-login-button"
-    data-scope="email, user_birthday, user_friends, publish_actions"
-    data-max-rows="1" data-size="large"
-    data-show-faces="true" data-auto-logout-link="true"></div>
+	data-scope="email, user_birthday, user_friends, publish_actions"
+	data-max-rows="1" data-size="large"
+	data-show-faces="true" data-auto-logout-link="true"></div>
 
 <div class='event'></div>
 
 <div>
-<table>
-<tr>
-<td><input type='text' class='title'></td>
-<td><input type='text' class='location'></td>
-<td>
-</tr>
-</table>
+	<table>
+		<tr>
+			<td><input type='text' class='title'></td>
+			<td><input type='text' class='location'></td>
+		</tr>
+	</table>
 </div>
 
 <div>
-<button onclick='aboutme.saveEvent();'>Submit</button><br>
-Chat: <input type='text' class='chat_message'>
-<button onclick='aboutme.chat();'>send</button>
+	<button onclick='aboutme.saveEvent();'>Post Status</button>
+	<p>&nbsp;</p>
+	Chat: <input type='text' class='chat_message'><button onclick='aboutme.chat();'>send</button>
 </div>
 <div class='chat_history'></div>
+<p>&nbsp;</p>
+
+<div class="gallery"></div>
+
+<form enctype="multipart/form-data" class="form_upload">
+	Upload File:
+	<input name="file" type="file" class="file_upload">
+	<input type="button" value="Upload" class="button_upload" onclick="aboutme.upload.action();">
+</form>
+<!--
+<progress></progress>
+-->
 
 <script type="text/javascript">
 $(document).ready(aboutme.main);
