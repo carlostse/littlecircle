@@ -7,7 +7,7 @@ threadsafe: true
 handlers:
 - url: /js
   static_dir: ../public/js
-- url: /gapp/.*
+- url: /.*
   script: littlecircle.app
 
 libraries:

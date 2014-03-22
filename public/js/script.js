@@ -14,7 +14,7 @@ var facebook = {
                     console.log('[response.status] connected, user: ' + uid);
                     console.log('[response.status] connected, token: ' + accessToken);
                     console.log('redirect to main page');
-                    window.location = '/main';
+                    window.location = aboutme.path.main;
 
                 } else if (response.status === 'not_authorized') {
                     // the user is logged in to Facebook,
@@ -32,7 +32,7 @@ var facebook = {
                     var uid = response.authResponse.userID;
                     console.log('[authResponseChange, connected] user: ' + uid);
                     console.log('redirect to main page');
-                    window.location = '/main';
+                    window.location = aboutme.path.main;
                 }
             });
 
@@ -80,6 +80,15 @@ var facebook = {
 
 var aboutme = {
     domain: 'project.aboutme.com.hk',
+    path: {
+        main: '/app/main',
+        upload_url: '/gapp/upload_url',
+        photo_search: '/gapp/search',
+        photo_view: '/gapp/view',
+        photo_download: 'http://i-littlecircle.appspot.com/download/',
+        event_query: '/app/event/query',
+        event_create: '/app/event/create'
+    },
     socket: null,
     socketPort: 3000,
     user: {
@@ -138,7 +147,7 @@ var aboutme = {
 
         // prepare upload photo
         aboutme.upload.prepare();
-        
+
         // web socket
         var socket = 'http://' + aboutme.domain + ':' + aboutme.socketPort;
         console.log('connect ' + socket);
@@ -194,7 +203,7 @@ var aboutme = {
             console.log('[loadEvent] load from server');
             $.ajax({
                 type: "GET",
-                url: '/event/query',
+                url: aboutme.path.event_query,
                 data: {
                     user_id: aboutme.user.fb_id
                 }
@@ -227,7 +236,7 @@ var aboutme = {
 
         $.ajax({
             type: "GET",
-            url: '/event/create',
+            url: aboutme.path.event_create,
             data: {
                 user_id: aboutme.user.fb_id,
                 event: event
@@ -261,13 +270,13 @@ var aboutme = {
             $.ajax({
                 url: aboutme.upload.url,
                 type: 'POST',
-                xhr: function() {  
+                xhr: function() {
                     // Custom XMLHttpRequest
                     var myXhr = $.ajaxSettings.xhr();
                     // Check if upload property exists
-                    if (myXhr.upload){ 
+                    if (myXhr.upload){
                         // For handling the progress of the upload
-                        myXhr.upload.addEventListener('progress', aboutme.upload.progressCallback, false); 
+                        myXhr.upload.addEventListener('progress', aboutme.upload.progressCallback, false);
                     }
                     return myXhr;
                 },
@@ -288,7 +297,7 @@ var aboutme = {
             form.hide();
             $.ajax({
                 type: "GET",
-                url: '/gapp/upload_url'
+                url: aboutme.path.upload_url
             }).done(function(data){
                 if (!data){
                     alert(['Your request cannot be processed, please try again later.<br>Ref. #' + 500]);
@@ -321,7 +330,7 @@ var aboutme = {
             // append photo
             $('div.gallery').append(aboutme.photo.getPhotoLink(data, aboutme.photo.num));
             aboutme.photo.initFancyBox(aboutme.photo.num++);
-            
+
             // get new upload URL
             aboutme.upload.prepare();
         },
@@ -335,7 +344,7 @@ var aboutme = {
         search: function(data){
             $.ajax({
                 type: "GET",
-                url: '/gapp/search',
+                url: aboutme.path.photo_search,
                 data: data
             }).done(function(data){
                 if (!data || data.length < 1){
@@ -349,7 +358,10 @@ var aboutme = {
             });
         },
         getPhotoLink: function(id, index){
-            return '<a id="img_' + index + '" href="/gapp/view?id=' + id + '&full=1"><img src="/gapp/view?id=' + id + '"></a>';
+            var
+            p = aboutme.path.photo_view + '?id=' + id,
+            d = aboutme.path.photo_download + id; // p + '&full=1';
+            return '<a id="img_' + index + '" href="' + d + '"><img src="' + p + '"></a>';
         },
         initFancyBox: function(index){
             $('a#img_' + index).fancybox({

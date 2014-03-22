@@ -8,8 +8,6 @@ from google.appengine.ext import blobstore
 from google.appengine.ext.webapp import blobstore_handlers
 from google.appengine.api import images
 
-URL_PREFIX = '/gapp'
-
 class Photo(ndb.Model):
     pkey = ndb.BlobKeyProperty()
     owner = ndb.StringProperty()
@@ -20,7 +18,7 @@ class Photo(ndb.Model):
 
 class UploadUrlHandler(webapp2.RequestHandler):
     def get(self):
-        link = blobstore.create_upload_url(URL_PREFIX + '/upload')
+        link = blobstore.create_upload_url('/upload')
         link = link[link.index('/') + 2:]
         link = link[link.index('/'):]
         self.response.headers['Content-Type'] = 'text/plain'
@@ -81,7 +79,7 @@ class ImageViewHandler(webapp2.RequestHandler):
             logging.info("[ImageViewHandler] send full: {}".format(blob_key))
             #blob_info = blobstore.BlobInfo.get(blob_key)
             #self.response.out.write(images.Image(blob_key=blob_key))
-            self.redirect(URL_PREFIX + '/download/%s' % blob_key)
+            self.redirect('/download/%s' % blob_key)
         else:
             logging.info("[ImageViewHandler] send thumbnail")
             img = images.Image(blob_key=blob_key)
@@ -95,19 +93,19 @@ class ImageDownloadHandler(blobstore_handlers.BlobstoreDownloadHandler):
         blob_info = blobstore.BlobInfo.get(resource)
 
         size = blob_info.size
-        logging.info("[ImageDownloadHandler] size: {}".format(size))
+        name = blob_info.filename
+        logging.info("[ImageDownloadHandler] {} ({})".format(name, size))
 
         #img = images.Image(blob_key=blob_info.key())
         #img.resize(width=200, height=200)
         #thumbnail = img.execute_transforms(output_encoding=images.JPEG)
-
-        self.response.headers['Content-Type'] = 'image/jpeg'
-        self.send_blob(blob_info)
+        #self.response.headers['Content-Type'] = 'image/jpeg'
+        self.send_blob(blob_info, save_as=name)
 
 app = webapp2.WSGIApplication([
-    (URL_PREFIX + '/upload_url', UploadUrlHandler),
-    (URL_PREFIX + '/upload', UploadHandler),
-    (URL_PREFIX + '/search', ImageSearchHandler),
-    (URL_PREFIX + '/view', ImageViewHandler),
-    (URL_PREFIX + '/download/([^/]+)?', ImageDownloadHandler)
+    ('/upload_url', UploadUrlHandler),
+    ('/upload', UploadHandler),
+    ('/search', ImageSearchHandler),
+    ('/view', ImageViewHandler),
+    ('/download/([^/]+)?', ImageDownloadHandler)
 ], debug=True)
