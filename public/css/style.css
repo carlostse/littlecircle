@@ -1,7 +1,28 @@
+html {
+    padding: 0px;
+}
 body {
-    padding: 50px;
+    padding: 0px;
     font: 14px 'Duru Sans', sans-serif;
 }
-.main_banner {
-    vertical-align: center;
+.index {
+    margin: 10px 0px;
+    width: 100%;
+    text-align: center;
+}
+.index .logo {
+    text-align: center;
+    height: 407px;
+    width: 628px;
+    margin: 0px auto;
+    background-image:url('/img/logo.png');
+    background-repeat: no-repeat;
+}
+.index .logo  img{
+    padding: 250px 0px 0px 100px;
+}
+.index .fb-login-button{
+    text-align: center;
+    margin: auto;
+    width: 50%;
 }
