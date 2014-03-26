@@ -10,6 +10,13 @@ body {
     width: 100%;
     text-align: center;
 }
+
+.fb-login-button{
+	padding-left: 70px;
+
+}
+
+
 .index .logo {
     text-align: center;
     height: 407px;
@@ -19,10 +26,33 @@ body {
     background-repeat: no-repeat;
 }
 .index .logo  img{
-    padding: 250px 0px 0px 100px;
+    padding: 220px 0px 0px 0px;
 }
 .index .fb-login-button{
     text-align: center;
-    margin: auto;
+    margin-left: 100px ;
     width: 50%;
+}
+.chatbase {
+	background-color: #E9F5FB;
+    position: absolute;
+	height: auto;
+	right: 10px;
+	top: 5px;
+	bottom: 40px;
+	width: 20%;
+	display: block;
+	box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+
+}
+.gallery {
+	background-color: #E9F5FB;
+	position: absolute;
+	height: auto;
+	left: 10px;
+	top: 50px;
+	bottom: 40px;
+	width: 75%;
+	display: block;
+	box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
 }
