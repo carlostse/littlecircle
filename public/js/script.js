@@ -85,7 +85,6 @@ var aboutme = {
         upload_url: '/gapp/upload_url',
         photo_search: '/gapp/search',
         photo_view: '/gapp/view',
-        photo_download: 'http://i-littlecircle.appspot.com/download/',
         event_query: '/app/event/query',
         event_create: '/app/event/create'
     },
@@ -360,7 +359,7 @@ var aboutme = {
         getPhotoLink: function(id, index){
             var
             p = aboutme.path.photo_view + '?id=' + id,
-            d = aboutme.path.photo_download + id; // p + '&full=1';
+            d = p + '&full=1';
             return '<a id="img_' + index + '" href="' + d + '"><img src="' + p + '"></a>';
         },
         initFancyBox: function(index){
