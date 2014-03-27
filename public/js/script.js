@@ -82,6 +82,7 @@ var aboutme = {
     domain: 'project.aboutme.com.hk',
     path: {
         main: '/app/main',
+        sync_user_url: '/gapp/sync_user',
         upload_url: '/gapp/upload_url',
         photo_search: '/gapp/search',
         photo_view: '/gapp/view',
@@ -98,9 +99,9 @@ var aboutme = {
             if (this.last_name) n += this.last_name;
             return n;
         },
-        loadFromFacebook: function(fb){
+        syncFacebookUser: function(fb){
             if (!fb){
-                console.log('[loadFromFacebook] data is null');
+                console.log('[syncFacebookUser] data is null');
                 return;
             }
             var bday = moment(fb.birthday, 'MM/DD/YYYY');
@@ -121,6 +122,23 @@ var aboutme = {
             this.birthday = null;
             if (postAction) postAction();
         }
+    },
+    syncUser: function(callback){
+        var u = aboutme.user;
+        delete u.name;
+        $.ajax({
+            type: "POST",
+            url: aboutme.path.sync_user_url,
+            data: {
+                user: JSON.stringify(u),
+            }
+        }).done(function(data){
+            if (!data || data.status != 1){
+                alert(['Your request cannot be processed, please try again later.<br>Ref. #' + 500]);
+                return;
+            }
+            if (callback)callback();
+        });
     },
     initFacebook: function(){
         FB.init({
@@ -182,10 +200,10 @@ var aboutme = {
 //         });
         FB.api('/' + uid, function(response) {
             console.log('[login] /' + uid + ': ' + JSON.stringify(response) + '.');
-            aboutme.user.loadFromFacebook(response);
+            aboutme.user.syncFacebookUser(response);
             console.log(aboutme.user.name + "'s birthday: " + aboutme.user.birthday);
+            aboutme.syncUser(aboutme.loadEvent);
             aboutme.socket.emit('online', aboutme.user);
-            aboutme.loadEvent();
         });
 
 //         console.log('loading friends');
@@ -264,7 +282,9 @@ var aboutme = {
     upload: {
         url: '',
         action: function(){
-            confirm('are you sure');
+            if (!confirm(aboutme.string.confirm_upload)){
+                return;
+            }
             var formData = new FormData($('form.form_upload')[0]);
             $.ajax({
                 url: aboutme.upload.url,
@@ -369,5 +389,8 @@ var aboutme = {
                 'transitionOut' : 'fade'
             });
         }
+    },
+    string: {
+        confirm_upload: 'Are you sure?'
     }
 };

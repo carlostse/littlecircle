@@ -8,7 +8,7 @@ handlers:
 - url: /js
   static_dir: ../public/js
 - url: /.*
-  script: littlecircle.app
+  script: application.app
 
 libraries:
 # https://developers.google.com/appengine/docs/python/tools/libraries27
