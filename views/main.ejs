@@ -27,16 +27,17 @@
 	<div>
 		<table>
 			<tr>
-				<td><input type="text" class="title"></td>
+				<td><input type="text" class="title"> @</td>
+                
 				<td><input type="text" class="location"></td>
 			</tr>
 		</table>
 	</div>
 
 	<div>
-		<button onclick="aboutme.saveEvent();">Post Status</button>
+		<button class="button_Post_Status" onclick="aboutme.saveEvent();">Post Status</button>
 		<p>&nbsp;</p>
-		Chat: <input type="text" class="chat_message"><button onclick="aboutme.chat();">send</button>
+		Chat: <input type="text" class="chat_message"><button class="button_send" onclick="aboutme.chat();">Send</button>
 	</div>
 	<div class="chat_history"></div>
 
@@ -50,8 +51,8 @@
 <div class="gallery"></div>
 
 <form enctype="multipart/form-data" class="form_upload">
-	Upload File:
-	<input name="file" type="file" class="file_upload">
+
+	<input name="file" type="file" class="file_upload" value="Upload">
 	<input type="button" value="Upload" class="button_upload" onclick="aboutme.upload.action();">
 </form>
 <!-- <progress></progress> -->
