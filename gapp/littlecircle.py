@@ -16,6 +16,8 @@ class Resp:
         })
 
 class User(ndb.Model):
+    FB_ID_INIT = 'fb'
+    # key: user ID, e.g. fb_id
     firstName = ndb.StringProperty()
     lastName = ndb.StringProperty()
     gender = ndb.StringProperty()
@@ -50,7 +52,7 @@ class User(ndb.Model):
         logging.info("[User] birthday: {}".format(birthday))
 
         return User(
-            key=ndb.Key(User, "FB{}".format(fb_id)),
+            key=ndb.Key(User, "{}{}".format(User.FB_ID_INIT, fb_id)),
             firstName=obj['first_name'],
             lastName=obj['last_name'],
             gender=obj['gender'],
@@ -68,5 +70,12 @@ class Photo(ndb.Model):
     owner = ndb.StringProperty()
     event = ndb.StringProperty()
     size = ndb.IntegerProperty()
-    photoDate = ndb.DateTimeProperty(auto_now=True)
-    uploadDate = ndb.DateTimeProperty(auto_now=True)
+    photoDate = ndb.DateTimeProperty(auto_now_add=True)
+    uploadDate = ndb.DateTimeProperty(auto_now_add=True)
+
+class Login(ndb.Model):
+    user = ndb.KeyProperty()
+    status = ndb.BooleanProperty()
+    loginDate = ndb.DateTimeProperty(auto_now_add=True)
+    logoutDate = ndb.DateTimeProperty()
+    lastModifiedDate = ndb.DateTimeProperty(auto_now=True)

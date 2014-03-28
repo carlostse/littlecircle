@@ -82,7 +82,8 @@ var aboutme = {
     domain: 'project.aboutme.com.hk',
     path: {
         main: '/app/main',
-        sync_user_url: '/gapp/sync_user',
+        user_sync_url: '/gapp/user_sync',
+        user_login_url: '/gapp/user_login',
         upload_url: '/gapp/upload_url',
         photo_search: '/gapp/search',
         photo_view: '/gapp/view',
@@ -123,12 +124,12 @@ var aboutme = {
             if (postAction) postAction();
         }
     },
-    syncUser: function(callback){
+    userSync: function(callback){
         var u = aboutme.user;
         delete u.name;
         $.ajax({
             type: "POST",
-            url: aboutme.path.sync_user_url,
+            url: aboutme.path.user_sync_url,
             data: {
                 user: JSON.stringify(u),
             }
@@ -138,6 +139,22 @@ var aboutme = {
                 return;
             }
             if (callback)callback();
+        });
+    },
+    userLogin: function(){
+        $.ajax({
+            type: "GET",
+            url: aboutme.path.user_login_url,
+            data: {
+                user_id: aboutme.user.fb_id,
+            }
+        }).done(function(data){
+            if (!data || data.status != 1){
+                alert(['Your request cannot be processed, please try again later.<br>Ref. #' + 500]);
+                return;
+            }
+            aboutme.user.sessionId = data.sessionId
+            console.log('sessionId: ' + aboutme.user.sessionId);
         });
     },
     initFacebook: function(){
@@ -181,8 +198,6 @@ var aboutme = {
             alert('emit offline: ' + JSON.stringify(aboutme.user));
         });
         */
-        // load photo
-        aboutme.photo.search({ event: '1'});
     },
     chat: function(){
         var msg = $('input.chat_message').val();
@@ -202,17 +217,24 @@ var aboutme = {
             console.log('[login] /' + uid + ': ' + JSON.stringify(response) + '.');
             aboutme.user.syncFacebookUser(response);
             console.log(aboutme.user.name + "'s birthday: " + aboutme.user.birthday);
-            aboutme.syncUser(aboutme.loadEvent);
             aboutme.socket.emit('online', aboutme.user);
-        });
 
-//         console.log('loading friends');
-//         FB.api("/me/friends", function (response) {
-//             console.log('friends: ' + response.data.length);
-//             if (response && !response.error) {
-//                 // handle the result
-//             }
-//         });
+            // sync user
+            aboutme.userSync(aboutme.loadEvent);
+
+            // login to little circle to get session ID
+            aboutme.userLogin();
+
+            // load photo
+            aboutme.photo.search({ event: '1'});
+        });
+//      console.log('loading friends');
+//      FB.api("/me/friends", function (response) {
+//          console.log('friends: ' + response.data.length);
+//          if (response && !response.error) {
+//              // handle the result
+//          }
+//      });
     },
     loadEvent: function(){
         var html = '';

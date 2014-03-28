@@ -5,7 +5,8 @@ import user_handler
 import photo_handler
 
 app = webapp2.WSGIApplication([
-    ('/sync_user', user_handler.SyncUserHandler),
+    ('/user_sync', user_handler.UserSyncHandler),
+    ('/user_login', user_handler.UserLoginHandler),
     ('/upload_url', photo_handler.UploadUrlHandler),
     ('/upload', photo_handler.UploadHandler),
     ('/search', photo_handler.ImageSearchHandler),
