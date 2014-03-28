@@ -1,5 +1,5 @@
 node_modules
-thumb.db
+Thumbs.db
 .?*
 *.sqlite
 *.pyc
