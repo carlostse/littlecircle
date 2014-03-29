@@ -1,6 +1,7 @@
 node_modules
 Thumbs.db
+log.txt
+gapp/index.yaml
 .?*
 *.sqlite
 *.pyc
-gapp/index.yaml

@@ -1,0 +1,71 @@
+#!/bin/bash
+#
+# LittleCircle Server  This shell script takes care of starting and stopping
+#                      the LittleCircle Server
+#
+SERV_NAME="LittleCircle Server"
+SERV_PATH="/home/iems5718/iems5718-server"
+SERV_MAIN="littlecircle.js"
+
+status() {
+        PID=`ps -ef | grep node | grep $SERV_MAIN | awk '{print $2}'`
+        if [ "$PID" == "" ]; then
+            echo "$SERV_NAME is not running"
+        else
+            echo "$SERV_NAME is running, pid: $PID"
+        fi
+}
+
+start() {
+        echo "Starting the service"
+        PID=`ps -ef | grep node | grep $SERV_MAIN | awk '{print $2}'`
+        if [ "$PID" == "" ]; then
+            cd $SERV_PATH
+            sh -c `/opt/node/bin/node $SERV_MAIN > log.txt` &
+            sleep 2
+            PID=`ps -ef | grep node | grep $SERV_MAIN | awk '{print $2}'`
+            if [ "$PID" == "" ]; then
+                echo "cannot start $SERV_NAME"
+            else
+                echo "$SERV_NAME is started"
+            fi
+        else
+            echo "$SERV_NAME is already running, pid: $PID"
+        fi
+}
+
+stop() {
+        echo "Stopping the service"
+        PID=`ps -ef | grep node | grep $SERV_MAIN | awk '{print $2}'`
+        if [ "$PID" == "" ]; then
+            echo "$SERV_NAME is not running"
+        else
+            kill $PID
+            sleep 2
+            PID=`ps -ef | grep node | grep -v grep | grep node_spdy.js | awk '{print $2}'`
+            if [ "$PID" == "" ]; then
+                echo "$SERV_NAME stopped"
+            else
+                echo "cannot stop $SERV_NAME"
+            fi
+        fi
+}
+
+case "$1" in
+  start)
+        start
+        ;;
+  stop)
+        stop
+        ;;
+  status)
+        status
+        ;;
+  restart|reload)
+        stop
+        start
+        ;;
+  *)
+        echo $"Usage: $0 {start|stop|restart|reload|status}"
+        exit 1
+esac
