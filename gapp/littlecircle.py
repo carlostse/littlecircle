@@ -70,6 +70,7 @@ class Photo(ndb.Model):
     owner = ndb.StringProperty()
     event = ndb.StringProperty()
     size = ndb.IntegerProperty()
+    thumbnail = ndb.BlobProperty(indexed=False)
     photoDate = ndb.DateTimeProperty(auto_now_add=True)
     uploadDate = ndb.DateTimeProperty(auto_now_add=True)
 

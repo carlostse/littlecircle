@@ -86,9 +86,7 @@ var aboutme = {
         user_login_url: '/gapp/user_login',
         upload_url: '/gapp/upload_url',
         photo_search: '/gapp/search',
-        photo_view: '/gapp/view',
-        event_query: '/app/event/query',
-        event_create: '/app/event/create'
+        photo_view: '/gapp/view'
     },
     socket: null,
     socketPort: 3000,
@@ -239,6 +237,7 @@ var aboutme = {
     loadEvent: function(){
         var html = '';
         if (aboutme.user.fb_id){
+            /*
             console.log('[loadEvent] load from server');
             $.ajax({
                 type: "GET",
@@ -257,6 +256,7 @@ var aboutme = {
                 });
                 $('div.event').html(html);
             });
+            */
         }
         $('div.event').html(html);
     },
@@ -272,7 +272,7 @@ var aboutme = {
         //aboutme.pushPost(event);
         console.log(aboutme.socket);
         aboutme.socket.emit('send', {message: event.title});
-
+        /*
         $.ajax({
             type: "GET",
             url: aboutme.path.event_create,
@@ -289,6 +289,7 @@ var aboutme = {
             location.val(null);
             aboutme.loadEvent();
         });
+        */
     },
     pushPost: function(event){
         console.log('push post to facebook');
@@ -416,3 +417,20 @@ var aboutme = {
         confirm_upload: 'Are you sure?'
     }
 };
+
+var isMissing = function(val){
+    if (!val) return true;
+    return typeof val == 'string'? val.trim().length < 1: val.length < 1;
+};
+
+function alert(messages){
+    var
+    success = typeof messages == 'string',
+    msg = isMissing(messages)? null: success? messages: messages.join('<br>'),
+    icons = $('img.icon');
+    $('div.dialog-message').html(msg);
+    $('div.dialog-head').html(success? "INFORMATION": "ERROR");
+    $($('img.icon').get(0)).css('display', success? 'none': 'inline');
+    $($('img.icon').get(1)).css('display', success? 'inline': 'none');
+    $('div.base').css('display', msg? 'inline': 'none');
+}

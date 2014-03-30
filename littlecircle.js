@@ -4,11 +4,7 @@
 var express = require('express')
   , http = require('http')
   , path = require('path')
-  , routes = require('./routes')
-  , event = require('./object/event');
-
-// init database
-require('./object/database').init();
+  , routes = require('./routes');
 
 // web environments
 var port = process.env.PORT || 3000;
@@ -28,8 +24,6 @@ if ('development' == app.get('env')) {
 }
 
 app.get('/main', routes.index);
-app.get('/event/create', event.actionCreate);
-app.get('/event/query', event.actionQuery);
 
 var io = require('socket.io').listen(app.listen(port), {log: false});
 console.log('Express server listening on port ' + port);

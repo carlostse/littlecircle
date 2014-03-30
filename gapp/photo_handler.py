@@ -11,6 +11,8 @@ from google.appengine.ext.webapp import blobstore_handlers
 from google.appengine.api import images
 import littlecircle
 
+LITTLECIRCLE_THUMBNAIL_W=200
+
 class UploadUrlHandler(webapp2.RequestHandler):
     def get(self):
         link = blobstore.create_upload_url('/upload')
@@ -30,20 +32,20 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         size = blob_info.size
         logging.info("[UploadHandler] size: {}".format(size))
 
+        # make thumbnail
+        img = images.Image(blob_key=blob_key)
+        img.resize(width=LITTLECIRCLE_THUMBNAIL_W)
+
         littlecircle.Photo(
             key=ndb.Key(littlecircle.Photo, str(blob_key)),
             owner=fid,
             event="1",
-            size=size
+            size=size,
+            thumbnail=img.execute_transforms(output_encoding=images.JPEG, quality=90)
         ).put()
 
-        #img = images.Image(blob_key=blob_key)
-        #meta = img.get_original_metadata()
-        #img.resize(width=200)
-        #thumbnail = img.execute_transforms(output_encoding=images.JPEG, quality=90)
-        #self.response.headers['Content-Type'] = 'image/jpeg'
-        #self.response.out.write(thumbnail)
-
+        meta = img.get_original_metadata()
+        logging.info("[UploadHandler] meta: {}".format(meta))
         self.response.out.write(blob_key)
 
 class ImageSearchHandler(webapp2.RequestHandler):
@@ -76,22 +78,35 @@ class ImageViewHandler(webapp2.RequestHandler):
 
         if full == '1':
             logging.info("[ImageViewHandler] send full: {}".format(blob_key))
-            #blob_info = blobstore.BlobInfo.get(blob_key)
-            #self.response.out.write(images.Image(blob_key=blob_key))
             self.redirect('/download/%s' % blob_key)
         else:
             logging.info("[ImageViewHandler] send thumbnail")
             try:
-                img = images.Image(blob_key=blob_key)
+                # get the stored photo
+                img = ndb.Key(littlecircle.Photo, blob_key).get()
                 if (img is None):
                     raise Exception("[ImageViewHandler] cannot find image: {}".format(blob_key))
+                else:
+                    # get the stored thumbnail
+                    thumbnail = img.thumbnail
+                    if (thumbnail is None):
+                        logging.info("[ImageViewHandler] thumbnail not found, try to make it")
+                        fullImg = images.Image(blob_key=blob_key)
+                        fullImg.resize(width=LITTLECIRCLE_THUMBNAIL_W)
+                        thumbnail = fullImg.execute_transforms(output_encoding=images.JPEG, quality=90)
+                        if (thumbnail is None):
+                            raise Exception("[ImageViewHandler] cannot make thumbnail: {}".format(blob_key))
 
-                img.resize(width=200)
-                thumbnail = img.execute_transforms(output_encoding=images.JPEG, quality=90)
-                self.response.out.write(thumbnail)
+                        logging.debug("[ImageViewHandler] save back the thumbnail")
+                        img.thumbnail = thumbnail
+                        img.put()
+                    else:
+                        logging.debug("[ImageViewHandler] found stored thumbnail")
+
+                    self.response.out.write(thumbnail)
             except:
                 logging.error("[ImageViewHandler] except: {}".format(sys.exc_info()))
-                self.error(404)            
+                self.error(404)
 
 class ImageDownloadHandler(blobstore_handlers.BlobstoreDownloadHandler):
     def get(self, resource):
@@ -110,9 +125,4 @@ class ImageDownloadHandler(blobstore_handlers.BlobstoreDownloadHandler):
         size = blob_info.size
         name = blob_info.filename
         logging.info("[ImageDownloadHandler] {} ({})".format(name, size))
-
-        #img = images.Image(blob_key=blob_info.key())
-        #img.resize(width=200, height=200)
-        #thumbnail = img.execute_transforms(output_encoding=images.JPEG)
-        #self.response.headers['Content-Type'] = 'image/jpeg'
         self.send_blob(blob_info, save_as=name)
