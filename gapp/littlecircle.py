@@ -80,3 +80,21 @@ class Login(ndb.Model):
     loginDate = ndb.DateTimeProperty(auto_now_add=True)
     logoutDate = ndb.DateTimeProperty()
     lastModifiedDate = ndb.DateTimeProperty(auto_now=True)
+
+    @staticmethod
+    def is_valid_sid(sid):
+        if (sid is None or sid.isdigit() == False):
+            logging.error("[Login] is_valid_sid, missing sid")
+            return False
+
+        login = Login.get_by_id(int(sid))
+        if (login is None):
+            logging.error("[Login] is_valid_sid, cannot find login: {}".format(sid))
+            return False
+
+        if (login.status == False):
+            logging.error("[Login] is_valid_sid, login expired: {}".format(sid))
+            return False
+
+        logging.debug("[Login] is_valid_sid, sid: {}, user: {}".format(sid, login.user))
+        return True

@@ -11,32 +11,42 @@ var facebook = {
                     // and signed request each expire
                     var uid = response.authResponse.userID;
                     var accessToken = response.authResponse.accessToken;
-                    console.log('[response.status] connected, user: ' + uid);
-                    console.log('[response.status] connected, token: ' + accessToken);
-                    console.log('redirect to main page');
+                    console.log('[getLoginStatus] connected, user: ' + uid);
+                    console.log('[getLoginStatus] connected, token: ' + accessToken);
+                    console.log('[getLoginStatus] redirect to main page');
                     window.location = aboutme.path.main;
 
                 } else if (response.status === 'not_authorized') {
                     // the user is logged in to Facebook,
                     // but has not authenticated your app
-                    console.log('[response.status] not_authorized');
+                    console.log('[getLoginStatus] not_authorized');
                 } else {
                     // the user isn't logged in to Facebook.
-                    console.log('[response.status] not logged in');
+                    console.log('[getLoginStatus] not logged in');
                 }
             });
 
-            // after user click login
+            // after user click login, if user login successfully, forward to main page
             FB.Event.subscribe('auth.authResponseChange', function(response) {
                 if (response.status === 'connected') {
                     var uid = response.authResponse.userID;
-                    console.log('[authResponseChange, connected] user: ' + uid);
-                    console.log('redirect to main page');
+                    console.log('[authResponseChange] connected, user: ' + uid);
+                    console.log('[authResponseChange] redirect to main page');
                     window.location = aboutme.path.main;
                 }
             });
 
         } else if (page == 'main'){
+            // check login status, if user does not login successfully, forward to index page
+            FB.getLoginStatus(function(response) {
+                if (response.status === 'connected') {
+                    console.log('[getLoginStatus] connected');
+                } else {
+                    console.log('[getLoginStatus] not logged in');
+                    window.location = aboutme.path.index;
+                }
+            });
+
             // Here we subscribe to the auth.authResponseChange JavaScript event. This event is fired
             // for any authentication related change, such as login, logout or session refresh. This means that
             // whenever someone who was previously logged out tries to log in again, the correct case below
@@ -48,9 +58,8 @@ var facebook = {
                     // login status of the person. In this case, we're handling the situation where they
                     // have logged in to the app.
                     var uid = response.authResponse.userID;
-                    console.log('[authResponseChange, connected] user: ' + uid);
+                    console.log('[authResponseChange] connected, user: ' + uid);
                     aboutme.login(uid);
-
                 } else if (response.status === 'not_authorized') {
                     // In this case, the person is logged into Facebook, but not into the app, so we call
                     // FB.login() to prompt them to do so.
@@ -59,7 +68,7 @@ var facebook = {
                     // (1) JavaScript created popup windows are blocked by most browsers unless they
                     // result from direct interaction from people using the app (such as a mouse click)
                     // (2) it is a bad experience to be continually prompted to login upon page load.
-                    console.log('[authResponseChange, not_authorized] not_authorized, login');
+                    console.log('[authResponseChange] not_authorized, ask for login');
                     FB.login();
                 } else {
                     // In this case, the person is not logged into Facebook, so we call the login()
@@ -68,7 +77,7 @@ var facebook = {
                     // dialog right after they log in to Facebook.
                     // The same caveats as above apply to the FB.login() call here.
                     console.log('[authResponseChange] seem logout');
-                    window.location = '/';
+                    window.location = aboutme.path.index;
                 }
             });
         }
@@ -81,9 +90,11 @@ var facebook = {
 var aboutme = {
     domain: 'project.aboutme.com.hk',
     path: {
+        index: '/',
         main: '/app/main',
         user_sync_url: '/gapp/user_sync',
         user_login_url: '/gapp/user_login',
+        user_logout_url: '/gapp/user_logout',
         upload_url: '/gapp/upload_url',
         photo_search: '/gapp/search',
         photo_view: '/gapp/view'
@@ -91,6 +102,7 @@ var aboutme = {
     socket: null,
     socketPort: 3000,
     user: {
+        sid: 0, // it won't be 0
         getName: function(){
             var n = '';
             if (this.first_name) n += this.first_name;
@@ -139,7 +151,7 @@ var aboutme = {
             if (callback)callback();
         });
     },
-    userLogin: function(){
+    userLogin: function(callback){
         $.ajax({
             type: "GET",
             url: aboutme.path.user_login_url,
@@ -151,8 +163,28 @@ var aboutme = {
                 alert(['Your request cannot be processed, please try again later.<br>Ref. #' + 500]);
                 return;
             }
-            aboutme.user.sessionId = data.sessionId
-            console.log('sessionId: ' + aboutme.user.sessionId);
+            aboutme.user.sid = data.sid
+            console.log('sid: ' + aboutme.user.sid);
+            if (callback)callback();
+        });
+    },
+    userLogout: function(callback){
+        if (aboutme.user.sid < 1)
+            return;
+        $.ajax({
+            type: "GET",
+            url: aboutme.path.user_logout_url,
+            data: {
+                sid: aboutme.user.sid,
+            }
+        }).done(function(data){
+            if (callback)callback(); // will always run
+            if (!data || data.status != 1){
+                // don't alert user
+                console.log('user logout failed: ' + (data? data.status: -1));
+                return;
+            }
+            console.log('user logout status: ' + data.status);
         });
     },
     initFacebook: function(){
@@ -221,10 +253,10 @@ var aboutme = {
             aboutme.userSync(aboutme.loadEvent);
 
             // login to little circle to get session ID
-            aboutme.userLogin();
-
-            // load photo
-            aboutme.photo.search({ event: '1'});
+            aboutme.userLogin(function(){
+                // load photo after login
+                aboutme.photo.search({ event: '1', sid: aboutme.user.sid});
+            });
         });
 //      console.log('loading friends');
 //      FB.api("/me/friends", function (response) {
@@ -233,6 +265,15 @@ var aboutme = {
 //              // handle the result
 //          }
 //      });
+    },
+    logout: function(){
+        console.log('logout: ' + aboutme.user.sid);
+        aboutme.userLogout(function(){
+            console.log('logout facebook');
+            FB.logout(function(response) {
+               console.log('FB.logout: ' + response);
+            });
+        });
     },
     loadEvent: function(){
         var html = '';
@@ -372,7 +413,7 @@ var aboutme = {
             // append the new uploaded photo
             $('div.gallery').append(aboutme.photo.getPhotoLink(data, aboutme.photo.num));
             aboutme.photo.initFancyBox(aboutme.photo.num++);
-            
+
             // close the create box
             $.fancybox.close();
 
@@ -388,11 +429,13 @@ var aboutme = {
         num: 0,
         getPhotoLink: function(id, index){
             var
-            p = aboutme.path.photo_view + '?id=' + id,
+            p = aboutme.path.photo_view + '?sid=' + aboutme.user.sid + '&id=' + id,
             d = p + '&full=1';
             return '<a id="img_' + index + '" href="' + d + '"><img src="' + p + '"></a>';
         },
         search: function(data){
+            if (!data.sid || data.sid < 1)
+                return;
             $.ajax({
                 type: "GET",
                 url: aboutme.path.photo_search,
@@ -402,7 +445,7 @@ var aboutme = {
                     return;
                 }
                 var div = $('div.gallery');
-                
+
                 // create event
                 div.append('<a class="create_event" href="#create_event"><img src="/img/add_event.png" class="add_event"></a>');
                 $("a.create_event").fancybox({
@@ -411,7 +454,7 @@ var aboutme = {
                     'enableEscapeButton': false,
                     'hideOnOverlayClick': false
                 });
-                
+
                 // display photo
                 data.forEach(function(o){
                     div.append(aboutme.photo.getPhotoLink(o.pkey, aboutme.photo.num));

@@ -73,6 +73,11 @@ class ImageViewHandler(webapp2.RequestHandler):
             self.error(404)
             return
 
+        if (littlecircle.Login.is_valid_sid(self.request.get('sid')) == False):
+            logging.error("[ImageViewHandler] invalid session id")
+            self.error(401)
+            return
+        
         full = self.request.get('full')
         logging.info("[ImageViewHandler] key: {} full: {}".format(blob_key, full))
 

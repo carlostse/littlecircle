@@ -37,7 +37,7 @@ class UserLoginResp(littlecircle.Resp):
         return json.dumps({
             'status': self.status,
             'userId': self.userId,
-            'sessionId': self.sessionId
+            'sid': self.sid
         })
 
 class UserLoginHandler(webapp2.RequestHandler):
@@ -66,9 +66,27 @@ class UserLoginHandler(webapp2.RequestHandler):
                 ).put()
                 r.status = 1
                 r.userId = userId
-                r.sessionId = str(k.id())
+                r.sid = str(k.id())
                 logging.info("[UserLoginHandler] user {} login".format(userId))
 
         self.response.headers['Content-Type'] = 'application/json'
         logging.info("[UserLoginHandler] status: {}".format(r.status))
+        self.response.out.write(r.toJson())
+
+class UserLogoutHandler(webapp2.RequestHandler):
+    def get(self):
+        r = littlecircle.Resp()
+        sid = self.request.get('sid')
+        if (sid is None or sid.isdigit() == False):
+            logging.error("[UserLogoutHandler] missing sid")
+        else:
+            login = littlecircle.Login.get_by_id(int(sid))
+            if (login is None):
+                logging.error("[UserLogoutHandler] cannot find login: {}".format(sid))
+            else:
+                login.status = False
+                login.put()
+                r.status = 1
+        self.response.headers['Content-Type'] = 'application/json'
+        logging.info("[UserLogoutHandler] status: {}".format(r.status))
         self.response.out.write(r.toJson())
