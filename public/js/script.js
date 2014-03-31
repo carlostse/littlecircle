@@ -369,9 +369,12 @@ var aboutme = {
                 alert(['Your request cannot be processed, please try again later.<br>Ref. #' + 500]);
                 return;
             }
-            // append photo
+            // append the new uploaded photo
             $('div.gallery').append(aboutme.photo.getPhotoLink(data, aboutme.photo.num));
             aboutme.photo.initFancyBox(aboutme.photo.num++);
+            
+            // close the create box
+            $.fancybox.close();
 
             // get new upload URL
             aboutme.upload.prepare();
@@ -383,6 +386,12 @@ var aboutme = {
     },
     photo: {
         num: 0,
+        getPhotoLink: function(id, index){
+            var
+            p = aboutme.path.photo_view + '?id=' + id,
+            d = p + '&full=1';
+            return '<a id="img_' + index + '" href="' + d + '"><img src="' + p + '"></a>';
+        },
         search: function(data){
             $.ajax({
                 type: "GET",
@@ -393,23 +402,28 @@ var aboutme = {
                     return;
                 }
                 var div = $('div.gallery');
+                
+                // create event
+                div.append('<a class="create_event" href="#create_event"><img src="/img/add_event.png" class="add_event"></a>');
+                $("a.create_event").fancybox({
+                    'transitionIn' : 'fade',
+                    'transitionOut': 'fade',
+                    'enableEscapeButton': false,
+                    'hideOnOverlayClick': false
+                });
+                
+                // display photo
                 data.forEach(function(o){
                     div.append(aboutme.photo.getPhotoLink(o.pkey, aboutme.photo.num));
                     aboutme.photo.initFancyBox(aboutme.photo.num++);
                 });
             });
         },
-        getPhotoLink: function(id, index){
-            var
-            p = aboutme.path.photo_view + '?id=' + id,
-            d = p + '&full=1';
-            return '<a id="img_' + index + '" href="' + d + '"><img src="' + p + '"></a>';
-        },
         initFancyBox: function(index){
             $('a#img_' + index).fancybox({
                 'type'          : 'image',
                 'transitionIn'  : 'elastic',
-                'transitionOut' : 'fade'
+                'transitionOut' : 'elastic'
             });
         }
     },
@@ -418,15 +432,17 @@ var aboutme = {
     }
 };
 
-var isMissing = function(val){
-    if (!val) return true;
-    return typeof val == 'string'? val.trim().length < 1: val.length < 1;
+var util = {
+    isMissing: function(val){
+        if (!val) return true;
+        return typeof val == 'string'? val.trim().length < 1: val.length < 1;
+    }
 };
 
 function alert(messages){
     var
     success = typeof messages == 'string',
-    msg = isMissing(messages)? null: success? messages: messages.join('<br>'),
+    msg = util.isMissing(messages)? null: success? messages: messages.join('<br>'),
     icons = $('img.icon');
     $('div.dialog-message').html(msg);
     $('div.dialog-head').html(success? "INFORMATION": "ERROR");

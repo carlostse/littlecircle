@@ -25,30 +25,30 @@ body {
     margin-left: 170px ;
 }
 .chatbase {
-	background-color: #B8E4EF;
+    background-color: #B8E4EF;
     position: absolute;
-	height: auto;
+    height: auto;
     left: 76%;
     right: 1%;
-	top: 5px;
-	bottom: 10px;
-	display: block;
-	box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+    top: 5px;
+    bottom: 10px;
+    display: block;
+    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
     padding-top:10px;
     padding-left:10px;
     padding-bottom:10px;
     padding-right:10px;
 }
 .gallery {
-	background-color: #E4F4F8;
-	position: absolute;
-	height: auto;
+    background-color: #E4F4F8;
+    position: absolute;
+    height: auto;
     left: 1%;
     right: 25%;
-	top: 45px;
-	bottom: 10px;
-	display: block;
-	box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+    top: 45px;
+    bottom: 10px;
+    display: block;
+    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
     padding-top:10px;
     padding-left:10px;
     padding-bottom:10px;
@@ -103,6 +103,21 @@ body {
     color: white;
     cursor: pointer;
     border-radius: 3px;
+}
+img.add_event {
+    width: 200px;
+    height: 200px;
+}
+div.create_event_box{
+    display:none;
+}
+div.create_event{
+    width: 600px;
+    overflow: auto;
+}
+div.create_event table {
+    width: 100%;
+    border: solid 1px;
 }
 /* alert dialog */
 div.base {
