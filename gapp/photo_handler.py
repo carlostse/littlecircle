@@ -23,7 +23,29 @@ class UploadUrlHandler(webapp2.RequestHandler):
 
 class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
     def post(self):
-        fid = self.request.get('fid')
+
+        # check user login
+        sid = self.request.get('sid')
+        login = littlecircle.Login.get_by_sid(sid)
+        if (login is None or login.is_valid() == False):
+            logging.error("[UploadHandler] invalid session id: {}".format(sid))
+            self.error(401)
+            return
+
+        # check user exists
+        user = login.user.get()
+        if (user is None):
+            logging.error("[UploadHandler] cannot get user, sid: {}".format(sid))
+            self.error(401)
+            return
+
+        ev = self.request.get('event')
+        logging.info("[UploadHandler] event: {}".format(ev))
+
+        event = json.loads(ev, object_hook=littlecircle.Event.object_decoder)
+        logging.info("[UploadHandler] user: {}, event: {}".format(user.name(), event.name))
+        eventKey = event.put()
+
         upload_files = self.get_uploads('file')  # 'file' is file upload field in the form
         logging.info("[UploadHandler] upload_files: {}".format(upload_files))
 
@@ -38,8 +60,8 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
 
         littlecircle.Photo(
             key=ndb.Key(littlecircle.Photo, str(blob_key)),
-            owner=fid,
-            event="1",
+            owner=login.user,
+            event=eventKey,
             size=size,
             thumbnail=img.execute_transforms(output_encoding=images.JPEG, quality=90)
         ).put()
@@ -52,14 +74,19 @@ class ImageSearchHandler(webapp2.RequestHandler):
     def get(self):
         event = self.request.get('event')
         logging.info("[ImageSearchHandler] event: {}".format(event))
-        list = littlecircle.Photo.query(littlecircle.Photo.event == event).order(littlecircle.Photo.uploadDate).fetch()
+
+        list = littlecircle.Photo.query(
+        littlecircle.Photo.deletedDate == None).order(
+        littlecircle.Photo.uploadDate).fetch()
+
         array = []
         for obj in list:
             array.append({
                 'pkey': obj.key.id(),
-                'owner': obj.owner,
-                'event': obj.event
+                'owner': obj.owner.string_id(),
+                'event': obj.event.id()
             })
+        logging.info("[ImageSearchHandler] array size: {}".format(len(array)))
         self.response.headers['Content-Type'] = 'application/json'
         self.response.out.write(json.dumps(array))
 
@@ -77,7 +104,7 @@ class ImageViewHandler(webapp2.RequestHandler):
             logging.error("[ImageViewHandler] invalid session id")
             self.error(401)
             return
-        
+
         full = self.request.get('full')
         logging.info("[ImageViewHandler] key: {} full: {}".format(blob_key, full))
 

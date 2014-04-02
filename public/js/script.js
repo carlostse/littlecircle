@@ -347,36 +347,6 @@ var aboutme = {
     },
     upload: {
         url: '',
-        action: function(){
-            if (!confirm(aboutme.string.confirm_upload)){
-                return;
-            }
-            var formData = new FormData($('form.form_upload')[0]);
-            $.ajax({
-                url: aboutme.upload.url,
-                type: 'POST',
-                xhr: function() {
-                    // Custom XMLHttpRequest
-                    var myXhr = $.ajaxSettings.xhr();
-                    // Check if upload property exists
-                    if (myXhr.upload){
-                        // For handling the progress of the upload
-                        myXhr.upload.addEventListener('progress', aboutme.upload.progressCallback, false);
-                    }
-                    return myXhr;
-                },
-                // events
-                // beforeSend: null,
-                success: aboutme.upload.successCallback,
-                error: aboutme.upload.errorCallback,
-                // Form data
-                data: formData,
-                // Options to tell jQuery not to process data or worry about content-type.
-                cache: false,
-                contentType: false,
-                processData: false
-            });
-        },
         prepare: function(){
             var form = $('form.form_upload');
             form.hide();
@@ -403,6 +373,46 @@ var aboutme = {
             });
             */
         },
+        action: function(){
+            if (!confirm(aboutme.string.confirm_upload)){
+                return;
+            }
+
+            var event = JSON.stringify({
+                name: 'event',
+                date: '2014/04/02',
+                location: 'Hong Kong',
+                desc: ''
+            });
+
+            var formData = new FormData($('form.form_upload')[0]);
+            formData.append('sid', aboutme.user.sid);
+            formData.append('event', event);
+            $.ajax({
+                url: aboutme.upload.url,
+                type: 'POST',
+                xhr: function() {
+                    // Custom XMLHttpRequest
+                    var myXhr = $.ajaxSettings.xhr();
+                    // Check if upload property exists
+                    if (myXhr.upload){
+                        // For handling the progress of the upload
+                        myXhr.upload.addEventListener('progress', aboutme.upload.progressCallback, false);
+                    }
+                    return myXhr;
+                },
+                // events
+                // beforeSend: null,
+                success: aboutme.upload.successCallback,
+                error: aboutme.upload.errorCallback,
+                // Form data
+                data: formData,
+                // Options to tell jQuery not to process data or worry about content-type.
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+        },
         progressCallback: function(e){
             //if (e.lengthComputable)
             //    $('progress').attr({value:e.loaded,max:e.total});
@@ -423,8 +433,18 @@ var aboutme = {
             aboutme.upload.prepare();
         },
         errorCallback: function (error){
-            //alert('errorHandler: ' + JSON.stringify(error));
-            alert(['Your request cannot be processed, please try again later.<br>Ref. #' + 500]);
+            console.log('upload error: ' + JSON.stringify(error));
+
+            if (error.status == 401){
+                window.location = aboutme.path.index
+                return;
+            }
+
+            // close the create box
+            $.fancybox.close();
+
+            var ref = error.statusText? error.statusText: '#500';
+            alert(['Your request cannot be processed, please try again later.<br>Ref. ' + ref]);
         }
     },
     photo: {
@@ -463,6 +483,9 @@ var aboutme = {
                     div.append(aboutme.photo.getPhotoLink(o.pkey, aboutme.photo.num));
                     aboutme.photo.initFancyBox(aboutme.photo.num++);
                 });
+            }).fail(function(data){
+                console.log(data);
+                alert(['Your request cannot be processed, please try again later.<br>Ref. #' + 500]);
             });
         },
         initFancyBox: function(index){

@@ -57,7 +57,8 @@ class User(ndb.Model):
             lastName=obj['last_name'],
             gender=obj['gender'],
             email=obj['email'],
-            birthday=birthday)
+            birthday=birthday
+        )
 
 '''
 From Google https://developers.google.com/appengine/docs/python/blobstore/blobkeyclass
@@ -67,32 +68,67 @@ so it can be used in user-facing data without being escaped.
 '''
 class Photo(ndb.Model):
     # key: blob_key
-    owner = ndb.StringProperty()
-    event = ndb.StringProperty()
+    owner = ndb.KeyProperty()
+    event = ndb.KeyProperty()
     size = ndb.IntegerProperty()
     thumbnail = ndb.BlobProperty(indexed=False)
     photoDate = ndb.DateTimeProperty(auto_now_add=True)
     uploadDate = ndb.DateTimeProperty(auto_now_add=True)
+    deletedBy = ndb.KeyProperty()
+    deletedDate = ndb.DateTimeProperty()
+
+class Event(ndb.Model):
+    # key: auto
+    name = ndb.StringProperty()
+    date = ndb.DateProperty()
+    location = ndb.StringProperty()
+    desc = ndb.StringProperty()
+
+    @staticmethod
+    def object_decoder(obj):
+        if (obj is None):
+            return None
+
+        day = obj['date']
+        date = None
+        if (core_util.is_missing(day) is False):
+            date = datetime.datetime.strptime(day, '%Y/%m/%d').date()
+        logging.info("[Event] date: {}".format(date))
+
+        return Event(
+            name=obj['name'],
+            date=date,
+            location=obj['location'],
+            desc=obj['desc']
+        )
 
 class Login(ndb.Model):
+    # key: auto
     user = ndb.KeyProperty()
     status = ndb.BooleanProperty()
     loginDate = ndb.DateTimeProperty(auto_now_add=True)
     logoutDate = ndb.DateTimeProperty()
     lastModifiedDate = ndb.DateTimeProperty(auto_now=True)
 
+    def is_valid(self):
+        return self.status
+
+    @staticmethod
+    def get_by_sid(sid):
+        if (sid is None or sid.isdigit() == False):
+            logging.error("[Login] get_by_sid, missing sid")
+            return None
+
+        return Login.get_by_id(int(sid))
+
     @staticmethod
     def is_valid_sid(sid):
-        if (sid is None or sid.isdigit() == False):
-            logging.error("[Login] is_valid_sid, missing sid")
-            return False
-
-        login = Login.get_by_id(int(sid))
+        login = Login.get_by_sid(sid)
         if (login is None):
             logging.error("[Login] is_valid_sid, cannot find login: {}".format(sid))
             return False
 
-        if (login.status == False):
+        if (login.is_valid() == False):
             logging.error("[Login] is_valid_sid, login expired: {}".format(sid))
             return False
 
