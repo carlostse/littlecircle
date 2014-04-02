@@ -55,7 +55,7 @@ body {
     padding-right:10px;
 }
 .file_upload{
-    width: 30%;
+    width: 60%;
     height: 28px;
     font-size: 18px;
     font-weight: normal;
@@ -64,6 +64,7 @@ body {
     cursor: pointer;
     font-family:"Open Sans", "lucida grande", "Segoe UI", arial, verdana, "lucida sans unicode", tahoma, sans-serif;
     border-radius: 3px;
+    
 }
 .button_upload{
     background: -webkit-gradient(linear, left top, left bottom, from(#2B84B3), to(#3B5898));
@@ -75,6 +76,7 @@ body {
     color: white;
     cursor: pointer;
     border-radius: 3px;
+    padding-right:10px;
 }
 .title{
     width:95%;

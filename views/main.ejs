@@ -45,31 +45,31 @@
 <div class="create_event_box">
 	<div id="create_event" class="create_event">
 		<form enctype="multipart/form-data" class="form_upload">
-		<table>
+		<table style="width:600px; border:0px;">
 			<tr>
-				<td>Event Name:</td>
+				<td style=" color: #2B84B3;    " >Event Name:</td>
 				<td><input type="text"></td>
 			</tr>
 			<tr>
-				<td>Event Date:</td>
+				<td style=" color: #2B84B3;    ">Event Date:</td>
 				<td><input type="text"></td>
 			</tr>
 			<tr>
-				<td>Event Location:</td>
+				<td style=" color: #2B84B3;    ">Event Location:</td>
 				<td><input type="text"></td>
 			</tr>
 			<tr>
-				<td>Event Description:</td>
-				<td><textarea></textarea></td>
+				<td style="vertical-align:top; color: #2B84B3;">Event Description:</td>
+				<td><textarea style="width:300px;height:100px;"></textarea></td>
 			</tr>
-			<tr>
-				<td colspan="2"><input name="file" type="file" class="file_upload" value="Upload"><!-- <progress></progress> --></td>
-			</tr>
-			<tr>
-				<td><input type="button" value="Upload" class="button_upload" onclick="aboutme.upload.action();"></td>
-				<td>&nbsp;</td>
-			</tr>
-		</table>
+            </table>
+			<br>
+				<input name="file" type="file" class="file_upload" value="Upload"><!-- <progress></progress> -->
+			
+				<input type="button" value="Upload" class="button_upload" onclick="aboutme.upload.action();">
+				
+			
+		
 		</form>
 	</div>
 </div>
