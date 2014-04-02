@@ -135,13 +135,11 @@ var aboutme = {
         }
     },
     userSync: function(callback){
-        var u = aboutme.user;
-        delete u.name;
         $.ajax({
             type: "POST",
             url: aboutme.path.user_sync_url,
             data: {
-                user: JSON.stringify(u),
+                user: JSON.stringify(aboutme.user),
             }
         }).done(function(data){
             if (!data || data.status != 1){
@@ -152,6 +150,10 @@ var aboutme = {
         });
     },
     userLogin: function(callback){
+        if (aboutme.user.sid > 0){
+            Console.log('already login');
+            return;
+        }
         $.ajax({
             type: "GET",
             url: aboutme.path.user_login_url,
@@ -441,7 +443,8 @@ var aboutme = {
                 url: aboutme.path.photo_search,
                 data: data
             }).done(function(data){
-                if (!data || data.length < 1){
+                if (!data){
+                    alert(['Your request cannot be processed, please try again later.<br>Ref. #' + 500]);
                     return;
                 }
                 var div = $('div.gallery');
