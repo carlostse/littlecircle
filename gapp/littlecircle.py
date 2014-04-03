@@ -69,14 +69,15 @@ so it can be used in user-facing data without being escaped.
 class Photo(ndb.Model):
     # key: blob_key
     owner = ndb.KeyProperty()
-    event = ndb.KeyProperty()
+    #event = ndb.KeyProperty()
     size = ndb.IntegerProperty()
-    thumbnail = ndb.BlobProperty(indexed=False)
+    geo = ndb.GeoPtProperty()
     photoDate = ndb.DateTimeProperty(auto_now_add=True)
+    thumbnail = ndb.BlobProperty(indexed=False)
     uploadDate = ndb.DateTimeProperty(auto_now_add=True)
     deletedBy = ndb.KeyProperty()
     deletedDate = ndb.DateTimeProperty()
-
+'''
 class Event(ndb.Model):
     # key: auto
     name = ndb.StringProperty()
@@ -101,7 +102,7 @@ class Event(ndb.Model):
             location=obj['location'],
             desc=obj['desc']
         )
-
+'''
 class Login(ndb.Model):
     # key: auto
     user = ndb.KeyProperty()

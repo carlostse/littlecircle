@@ -5,6 +5,7 @@ import urllib
 import webapp2
 import json
 import logging
+import core_util
 from google.appengine.ext import ndb
 from google.appengine.ext import blobstore
 from google.appengine.ext.webapp import blobstore_handlers
@@ -39,12 +40,12 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
             self.error(401)
             return
 
-        ev = self.request.get('event')
-        logging.info("[UploadHandler] event: {}".format(ev))
+        #ev = self.request.get('event')
+        #logging.info("[UploadHandler] event: {}".format(ev))
 
-        event = json.loads(ev, object_hook=littlecircle.Event.object_decoder)
-        logging.info("[UploadHandler] user: {}, event: {}".format(user.name(), event.name))
-        eventKey = event.put()
+        #event = json.loads(ev, object_hook=littlecircle.Event.object_decoder)
+        #logging.info("[UploadHandler] user: {}, event: {}".format(user.name(), event.name))
+        #eventKey = event.put()
 
         upload_files = self.get_uploads('file')  # 'file' is file upload field in the form
         logging.info("[UploadHandler] upload_files: {}".format(upload_files))
@@ -57,17 +58,33 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         # make thumbnail
         img = images.Image(blob_key=blob_key)
         img.resize(width=LITTLECIRCLE_THUMBNAIL_W)
+        thumb = img.execute_transforms(output_encoding=images.JPEG, quality=90, parse_source_metadata=True)
 
+        # try to get geo location and date time of the photo
+        meta = img.get_original_metadata()
+        logging.debug("[UploadHandler] meta: {}".format(meta))
+
+        dt = None
+        if ('DateTime' in meta):
+            dt = core_util.exif_datetime_to_datetime(meta['DateTime'])
+
+        loc = None
+        if ('GPSLatitude' in meta and 'GPSLongitude' in meta):
+            loc = ndb.GeoPt(meta['GPSLatitude'], meta['GPSLongitude'])
+
+        logging.info("[UploadHandler] photo taken at {} in location {}".format(dt, loc))
+
+        # save photo information
         littlecircle.Photo(
             key=ndb.Key(littlecircle.Photo, str(blob_key)),
             owner=login.user,
-            event=eventKey,
+            #event=eventKey,
             size=size,
-            thumbnail=img.execute_transforms(output_encoding=images.JPEG, quality=90)
+            geo=loc,
+            photoDate=dt,
+            thumbnail=thumb
         ).put()
 
-        meta = img.get_original_metadata()
-        logging.info("[UploadHandler] meta: {}".format(meta))
         self.response.out.write(blob_key)
 
 class ImageSearchHandler(webapp2.RequestHandler):
@@ -83,8 +100,8 @@ class ImageSearchHandler(webapp2.RequestHandler):
         for obj in list:
             array.append({
                 'pkey': obj.key.id(),
-                'owner': obj.owner.string_id(),
-                'event': obj.event.id()
+                'owner': obj.owner.string_id()#,
+                #'event': obj.event.id()
             })
         logging.info("[ImageSearchHandler] array size: {}".format(len(array)))
         self.response.headers['Content-Type'] = 'application/json'
