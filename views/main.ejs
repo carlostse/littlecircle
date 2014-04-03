@@ -2,7 +2,6 @@
 <html>
 <head>
 <title><%= title %></title>
-<link rel="icon" href="favicon.ico" type="image/x-icon">
 <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Duru+Sans">
 <link rel="stylesheet" type="text/css" href="/css/fancybox/jquery.fancybox-1.3.4.css">
 <link rel="stylesheet" type="text/css" href="/css/style.css">
@@ -19,23 +18,21 @@
 		data-scope="email, user_birthday, user_friends, publish_actions"
 		data-max-rows="1" data-size="large"
 		data-show-faces="true" data-auto-logout-link="false"></div>
-    <button onclick="aboutme.logout();">Logout</button>
+    <button id="logout_button" onclick="aboutme.logout();">Logout</button>
 	<div class="event"></div>
 
-	<div>
-		<table>
-			<tr>
-				<td><input type="text" class="title" placeholder="doing..."></td>
-                <td>@</td>
-				<td><input type="text" class="location" placeholder="somewhere..."></td>
-			</tr>
-		</table>
-	</div>
+    <br>
+    <br>
+    <br>
+    <br>
 
 	<div>
-		<button class="button_Post_Status" onclick="aboutme.saveEvent();">Post Status</button>
-		<p>&nbsp;</p>
-		Chat: <input type="text" class="chat_message"><button class="button_send" onclick="aboutme.chat();">Send</button>
+
+		Chat: 
+        <br>
+        <textarea type="text" class="chat_message"></textarea>
+        <br>
+        <button class="button_send" onclick="aboutme.chat();">Send</button>
 	</div>
 	<div class="chat_history"></div>
 </div>

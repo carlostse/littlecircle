@@ -28,27 +28,27 @@ body {
     background-color: #B8E4EF;
     position: absolute;
     height: auto;
-    left: 76%;
-    right: 1%;
-    top: 5px;
-    bottom: 10px;
+    left: 77%;
+    right: 2%;
+    top: 15px;
+    bottom: 25px;
     display: block;
-    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+    box-shadow: 0px 12px 12px rgba(0, 0, 0, 0.5);
     padding-top:10px;
     padding-left:10px;
     padding-bottom:10px;
     padding-right:10px;
 }
 .gallery {
-    background-color: #E4F4F8;
+    background-color: #2B84B3;
     position: absolute;
     height: auto;
-    left: 1%;
+    left: 2%;
     right: 25%;
-    top: 5px;
-    bottom: 10px;
+    top: 15px;
+    bottom: 25px;
     display: block;
-    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+    box-shadow: 0px 12px 12px rgba(0, 0, 0, 0.5);
     padding-top:10px;
     padding-left:10px;
     padding-bottom:10px;
@@ -105,6 +105,25 @@ body {
     color: white;
     cursor: pointer;
     border-radius: 3px;
+}
+#logout_button{
+    width: 100px;
+    background: -webkit-gradient(linear, left top, left bottom, from(#2B84B3), to(#3B5898));
+    height: 22px;
+    font-size: 16px;
+    font-weight: normal;
+    border: 1px solid #2B84B3;
+    color: white;
+    cursor: pointer;
+    border-radius: 3px;
+}
+.chat_message{
+    width:100%;
+    left:5%;
+    right:5%;
+    height:80px;
+    
+
 }
 img.add_event {
     width: 200px;
