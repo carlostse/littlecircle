@@ -232,7 +232,7 @@ var aboutme = {
         */
     },
     chat: function(){
-        var msg = $('input.chat_message').val();
+        var msg = $('textarea.chat_message').val();
         if (msg){
             var send = {user: aboutme.user, message: msg};
             console.log(JSON.stringify(send));
