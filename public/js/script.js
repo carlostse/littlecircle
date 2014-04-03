@@ -452,7 +452,7 @@ var aboutme = {
         getPhotoLink: function(id, index){
             var
             p = aboutme.path.photo_view + '?sid=' + aboutme.user.sid + '&id=' + id,
-            d = p + '&full=1';
+            d = p + '&size=2';
             return '<a id="img_' + index + '" href="' + d + '"><img src="' + p + '"></a>';
         },
         search: function(data){

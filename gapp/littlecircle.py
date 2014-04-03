@@ -73,6 +73,7 @@ class Photo(ndb.Model):
     size = ndb.IntegerProperty()
     geo = ndb.GeoPtProperty()
     photoDate = ndb.DateTimeProperty(auto_now_add=True)
+    preview = ndb.BlobProperty(indexed=False)
     thumbnail = ndb.BlobProperty(indexed=False)
     uploadDate = ndb.DateTimeProperty(auto_now_add=True)
     deletedBy = ndb.KeyProperty()
