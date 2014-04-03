@@ -5,6 +5,7 @@ import urllib
 import webapp2
 import json
 import logging
+import core_util
 from google.appengine.ext import ndb
 from google.appengine.ext import blobstore
 from google.appengine.ext.webapp import blobstore_handlers
@@ -12,6 +13,7 @@ from google.appengine.api import images
 import littlecircle
 
 LITTLECIRCLE_THUMBNAIL_W=200
+LITTLECIRCLE_PREVIEW_W=LITTLECIRCLE_THUMBNAIL_W*2
 
 class UploadUrlHandler(webapp2.RequestHandler):
     def get(self):
@@ -39,12 +41,12 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
             self.error(401)
             return
 
-        ev = self.request.get('event')
-        logging.info("[UploadHandler] event: {}".format(ev))
+        #ev = self.request.get('event')
+        #logging.info("[UploadHandler] event: {}".format(ev))
 
-        event = json.loads(ev, object_hook=littlecircle.Event.object_decoder)
-        logging.info("[UploadHandler] user: {}, event: {}".format(user.name(), event.name))
-        eventKey = event.put()
+        #event = json.loads(ev, object_hook=littlecircle.Event.object_decoder)
+        #logging.info("[UploadHandler] user: {}, event: {}".format(user.name(), event.name))
+        #eventKey = event.put()
 
         upload_files = self.get_uploads('file')  # 'file' is file upload field in the form
         logging.info("[UploadHandler] upload_files: {}".format(upload_files))
@@ -54,20 +56,41 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         size = blob_info.size
         logging.info("[UploadHandler] size: {}".format(size))
 
-        # make thumbnail
+        # make preview
         img = images.Image(blob_key=blob_key)
-        img.resize(width=LITTLECIRCLE_THUMBNAIL_W)
+        img.resize(width=LITTLECIRCLE_PREVIEW_W)
+        preview = img.execute_transforms(output_encoding=images.JPEG, quality=90, parse_source_metadata=True)
+        
+        # try to get geo location and date time of the photo
+        meta = img.get_original_metadata()
+        logging.debug("[UploadHandler] meta: {}".format(meta))
 
+        dt = None
+        if ('DateTime' in meta):
+            dt = core_util.exif_datetime_to_datetime(meta['DateTime'])
+
+        loc = None
+        if ('GPSLatitude' in meta and 'GPSLongitude' in meta):
+            loc = ndb.GeoPt(meta['GPSLatitude'], meta['GPSLongitude'])
+
+        logging.info("[UploadHandler] photo taken at {} in location {}".format(dt, loc))
+        
+        # make thumbnail
+        img.resize(width=LITTLECIRCLE_THUMBNAIL_W)
+        thumb = img.execute_transforms(output_encoding=images.JPEG, quality=90)
+
+        # save photo information
         littlecircle.Photo(
             key=ndb.Key(littlecircle.Photo, str(blob_key)),
             owner=login.user,
-            event=eventKey,
+            #event=eventKey,
             size=size,
-            thumbnail=img.execute_transforms(output_encoding=images.JPEG, quality=90)
+            geo=loc,
+            photoDate=dt,
+            preview=preview,
+            thumbnail=thumb
         ).put()
 
-        meta = img.get_original_metadata()
-        logging.info("[UploadHandler] meta: {}".format(meta))
         self.response.out.write(blob_key)
 
 class ImageSearchHandler(webapp2.RequestHandler):
@@ -84,7 +107,9 @@ class ImageSearchHandler(webapp2.RequestHandler):
             array.append({
                 'pkey': obj.key.id(),
                 'owner': obj.owner.string_id(),
-                'event': obj.event.id()
+                'datetime': core_util.date_to_str(obj.photoDate),
+                'geo': core_util.geo_to_string(obj.geo)
+                #'event': obj.event.id()
             })
         logging.info("[ImageSearchHandler] array size: {}".format(len(array)))
         self.response.headers['Content-Type'] = 'application/json'
@@ -105,12 +130,40 @@ class ImageViewHandler(webapp2.RequestHandler):
             self.error(401)
             return
 
-        full = self.request.get('full')
-        logging.info("[ImageViewHandler] key: {} full: {}".format(blob_key, full))
+        size = self.request.get('size')
+        logging.info("[ImageViewHandler] key: {} size: {}".format(blob_key, size))
 
-        if full == '1':
-            logging.info("[ImageViewHandler] send full: {}".format(blob_key))
+        if size == '2':
+            logging.info("[ImageViewHandler] send size: {}".format(blob_key))
             self.redirect('/download/%s' % blob_key)
+        elif size == '1':
+            logging.info("[ImageViewHandler] send preview")
+            try:
+                # get the stored photo
+                img = ndb.Key(littlecircle.Photo, blob_key).get()
+                if (img is None):
+                    raise Exception("[ImageViewHandler] cannot find image: {}".format(blob_key))
+                else:
+                    # get the stored preview
+                    preview = img.preview
+                    if (preview is None):
+                        logging.info("[ImageViewHandler] preview not found, try to make it")
+                        fullImg = images.Image(blob_key=blob_key)
+                        fullImg.resize(width=LITTLECIRCLE_PREVIEW_W)
+                        preview = fullImg.execute_transforms(output_encoding=images.JPEG, quality=90)
+                        if (preview is None):
+                            raise Exception("[ImageViewHandler] cannot make preview: {}".format(blob_key))
+
+                        logging.debug("[ImageViewHandler] save back the preview")
+                        img.preview = preview
+                        img.put()
+                    else:
+                        logging.debug("[ImageViewHandler] found stored preview")
+
+                    self.response.out.write(preview)
+            except:
+                logging.error("[ImageViewHandler] except: {}".format(sys.exc_info()))
+                self.error(404)
         else:
             logging.info("[ImageViewHandler] send thumbnail")
             try:
