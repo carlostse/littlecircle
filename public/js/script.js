@@ -374,9 +374,9 @@ var aboutme = {
             */
         },
         action: function(){
-            if (!confirm(aboutme.string.confirm_upload)){
-                return;
-            }
+//            if (!confirm(aboutme.string.confirm_upload)){
+//                return;
+//            }
 
             var event = JSON.stringify({
                 name: 'event',
@@ -453,7 +453,9 @@ var aboutme = {
             var
             p = aboutme.path.photo_view + '?sid=' + aboutme.user.sid + '&id=' + id,
             d = p + '&size=2';
-            return '<a id="img_' + index + '" href="' + d + '"><img src="' + p + '"></a>';
+            return '<a id="img_' + index + '" href="' + d + '">' + 
+                    '<img src="' + p + '" class="showimg" onmouseover="util.bigImg(this);" onmouseout="util.normalImg(this);">' + 
+                   '</a>';
         },
         search: function(data){
             if (!data.sid || data.sid < 1)
@@ -467,9 +469,9 @@ var aboutme = {
                     alert(['Your request cannot be processed, please try again later.<br>Ref. #' + 500]);
                     return;
                 }
-                var div = $('div.gallery');
+                var div = $('div.showcase_container');
 
-                // create event
+                /* create event
                 div.append('<a class="create_event" href="#create_event"><img src="/img/add_event.png" class="add_event"></a>');
                 $("a.create_event").fancybox({
                     'transitionIn' : 'fade',
@@ -477,10 +479,15 @@ var aboutme = {
                     'enableEscapeButton': false,
                     'hideOnOverlayClick': false
                 });
-
+                */
+                
                 // display photo
-                data.forEach(function(o){
-                    div.append(aboutme.photo.getPhotoLink(o.pkey, aboutme.photo.num));
+                data.forEach(function(o, i){
+                    div.append(
+                        '<div id="i1_"' + i + '" class="showcase_item">' +
+                        aboutme.photo.getPhotoLink(o.pkey, aboutme.photo.num) +
+                        '</div>'
+                    );
                     aboutme.photo.initFancyBox(aboutme.photo.num++);
                 });
             }).fail(function(data){
@@ -505,6 +512,14 @@ var util = {
     isMissing: function(val){
         if (!val) return true;
         return typeof val == 'string'? val.trim().length < 1: val.length < 1;
+    },
+    bigImg: function(x){
+        x.style.height= "auto";
+        x.style.width="220px";
+    },
+    normalImg: function(x){
+        x.style.height= "auto";
+        x.style.width= "200px";
     }
 };
 

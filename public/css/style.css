@@ -55,7 +55,6 @@ body {
     padding-right:10px;
 }
 .showcase_item {
-    
     position: relative;
     width: 220px;
     height: 170px;
@@ -70,9 +69,6 @@ body {
     cursor:pointer;
     box-shadow: 12px 12px 12px rgba(0, 0, 0, 0.5);
     height: auto;
-    
-    
-    
 }
 .file_upload{
     width: 60%;
@@ -142,8 +138,6 @@ body {
     left:5%;
     right:5%;
     height:50px;
-    
-
 }
 img.add_event {
     width: 200px;
@@ -159,6 +153,14 @@ div.create_event{
 div.create_event table {
     width: 100%;
     border: solid 1px;
+}
+img.banner {
+    position:absolute; 
+    right:1%; 
+    bottom:1%; 
+    width: 200px; 
+    cursor:pointer; 
+    height: auto;
 }
 /* alert dialog */
 div.base {
