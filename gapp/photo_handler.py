@@ -106,7 +106,9 @@ class ImageSearchHandler(webapp2.RequestHandler):
         for obj in list:
             array.append({
                 'pkey': obj.key.id(),
-                'owner': obj.owner.string_id()#,
+                'owner': obj.owner.string_id(),
+                'datetime': core_util.date_to_str(obj.photoDate),
+                'geo': core_util.geo_to_string(obj.geo)
                 #'event': obj.event.id()
             })
         logging.info("[ImageSearchHandler] array size: {}".format(len(array)))
