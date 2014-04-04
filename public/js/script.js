@@ -449,8 +449,6 @@ var aboutme = {
                 return;
             }
             // cannot append, have to re-load all
-//          $('div.gallery').append(aboutme.photo.getPhotoLink(data, aboutme.photo.num));
-//          aboutme.photo.initFancyBox('image', aboutme.photo.num++);
             aboutme.photo.search({ sid: aboutme.user.sid});
 
             // close the loading box
@@ -483,8 +481,8 @@ var aboutme = {
             var
             p = aboutme.path.photo_view + '?sid=' + aboutme.user.sid + '&id=' + id,
             d = p + '&size=2';
-            return  '<a id="img_' + index + '" href="' + d + '">' +
-                        '<img src="' + p + '" class="showimg" id="image_' + index + '" onmouseout="util.resize(this, 0);" onmouseover="util.resize(this, 1);">' +
+            return  '<a id="image_' + index + '" href="' + d + '">' +
+                        '<img src="' + p + '" class="showimg" id="img_' + index + '" onmouseout="util.resize(this, 0);" onmouseover="util.resize(this, 1);">' +
                     '</a>';
         },
         getPhotoCell: function(o, i){
@@ -531,7 +529,9 @@ var aboutme = {
                     aboutme.photo.num++;
                 });
 
-                $('div.showcase_container').html(html);
+                var div = $('div.showcase_container');
+                div.empty();
+                div.append(html);
 
                 // init fancy box
                 data.forEach(function(o, i){
@@ -569,7 +569,7 @@ var util = {
         var img = $(x);
         img.css('height', "auto");
         img.css('width', (type == 1? 210: type == 2? 400: 200) + 'px');
-        $('div.' + img.attr('id').replace('image_', 'blackbg_')).css('right', (type == 1? 10: 20) + 'px');
+        $('div.' + img.attr('id').replace('img_', 'blackbg_')).css('right', (type == 1? 10: 20) + 'px');
     }
 };
 
