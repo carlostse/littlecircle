@@ -218,7 +218,7 @@ var aboutme = {
             'enableEscapeButton': false,
             'hideOnOverlayClick': false
         });
-                
+
         // prepare upload photo
         aboutme.upload.prepare();
 
@@ -401,12 +401,19 @@ var aboutme = {
             */
         },
         action: function(){
-//            if (!confirm(aboutme.string.confirm_upload)){
-//                return;
-//            }
+//          if (!confirm(aboutme.string.confirm_upload)){
+//              return;
+//          }
 
+            // prepare form data
             var formData = new FormData($('form.form_upload')[0]);
             formData.append('sid', aboutme.user.sid);
+            
+            // close the upload box and show loading
+            $.fancybox.close();
+            $('div.loading').css('display', 'inline');
+            
+            // submit
             $.ajax({
                 url: aboutme.upload.url,
                 type: 'POST',
@@ -441,12 +448,13 @@ var aboutme = {
                 alert(['Your request cannot be processed, please try again later.<br>Ref. #' + 500]);
                 return;
             }
-            // append the new uploaded photo
-            $('div.gallery').append(aboutme.photo.getPhotoLink(data, aboutme.photo.num));
-            aboutme.photo.initFancyBox('image', aboutme.photo.num++);
+            // cannot append, have to re-load all
+//          $('div.gallery').append(aboutme.photo.getPhotoLink(data, aboutme.photo.num));
+//          aboutme.photo.initFancyBox('image', aboutme.photo.num++);
+            aboutme.photo.search({ sid: aboutme.user.sid});
 
-            // close the create box
-            $.fancybox.close();
+            // close the loading box
+            $('div.loading').css('display', 'none');
 
             // hide the upload button and wait for the new upload session
             $('a.create_event').css('visibility', 'visible');
@@ -462,8 +470,8 @@ var aboutme = {
                 return;
             }
 
-            // close the create box
-            $.fancybox.close();
+            // close the loading box
+            $('div.loading').css('display', 'none');
 
             var ref = error.statusText? error.statusText: '#500';
             alert(['Your request cannot be processed, please try again later.<br>Ref. ' + ref]);
@@ -475,9 +483,19 @@ var aboutme = {
             var
             p = aboutme.path.photo_view + '?sid=' + aboutme.user.sid + '&id=' + id,
             d = p + '&size=2';
-            return '<a id="img_' + index + '" href="' + d + '">' +
-                    '<img src="' + p + '" class="showimg" id="image_' + index + '" onmouseout="util.resize(this, 0);" onmouseover="util.resize(this, 1);">' +
-                   '</a>';
+            return  '<a id="img_' + index + '" href="' + d + '">' +
+                        '<img src="' + p + '" class="showimg" id="image_' + index + '" onmouseout="util.resize(this, 0);" onmouseover="util.resize(this, 1);">' +
+                    '</a>';
+        },
+        getPhotoCell: function(o, i){
+            return  '<td>' +
+                        '<div class="showcase_item">' +
+                            aboutme.photo.getPhotoLink(o.pkey, i) +
+                            '<div class="blackbg blackbg_' + i + '">&nbsp;</div>' +
+                            '<div class="datetime">' + o.datetime + '</div>' +
+                            (o.geo? '<div class="geo"><a id="map_' + i + '" href="/app/map/' + o.geo + '">show map</a></div>': '') +
+                        '</div>' +
+                    '</td>';
         },
         search: function(data){
             if (!data.sid || data.sid < 1)
@@ -505,21 +523,15 @@ var aboutme = {
                     if (o.geo)
                         maps.push(i);
 
-                    html +=
-                        '<td>' +
-                            '<div class="showcase_item">' +
-                                aboutme.photo.getPhotoLink(o.pkey, aboutme.photo.num++) +
-                                '<div class="blackbg blackbg_' + i + '">&nbsp;</div>' +
-                                '<div class="datetime">' + o.datetime + '</div>' +
-                                (o.geo? '<div class="geo"><a id="map_' + i + '" href="/app/map/' + o.geo + '">show map</a></div>': '') +
-                            '</div>' +
-                        '</td>'
+                    html += aboutme.photo.getPhotoCell(o, i);
 
                     if (i == idx)
                         html += '</tr></table>';
+
+                    aboutme.photo.num++;
                 });
 
-                $('div.showcase_container').append(html);
+                $('div.showcase_container').html(html);
 
                 // init fancy box
                 data.forEach(function(o, i){
