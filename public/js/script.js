@@ -453,8 +453,8 @@ var aboutme = {
             var
             p = aboutme.path.photo_view + '?sid=' + aboutme.user.sid + '&id=' + id,
             d = p + '&size=2';
-            return '<a id="img_' + index + '" href="' + d + '">' + 
-                    '<img src="' + p + '" class="showimg" onmouseover="util.bigImg(this);" onmouseout="util.normalImg(this);">' + 
+            return '<a id="img_' + index + '" href="' + d + '">' +
+                    '<img src="' + p + '" class="showimg" id="image_' + index + '" onmouseout="util.resize(this, 0);" onmouseover="util.resize(this, 1);">' +
                    '</a>';
         },
         search: function(data){
@@ -469,27 +469,36 @@ var aboutme = {
                     alert(['Your request cannot be processed, please try again later.<br>Ref. #' + 500]);
                     return;
                 }
-                var div = $('div.showcase_container');
+                var html = ''; // cannot append to div directly due to threading problem
 
-                /* create event
-                div.append('<a class="create_event" href="#create_event"><img src="/img/add_event.png" class="add_event"></a>');
-                $("a.create_event").fancybox({
-                    'transitionIn' : 'fade',
-                    'transitionOut': 'fade',
-                    'enableEscapeButton': false,
-                    'hideOnOverlayClick': false
-                });
-                */
-                
                 // display photo
+                var idx = data.length - 1;
                 data.forEach(function(o, i){
-                    div.append(
-                        '<div id="i1_"' + i + '" class="showcase_item">' +
-                        aboutme.photo.getPhotoLink(o.pkey, aboutme.photo.num) +
-                        '</div>'
-                    );
-                    aboutme.photo.initFancyBox(aboutme.photo.num++);
+                    if (i == 0)
+                        html += '<table><tr>';
+                    else if (i % 4 == 0)
+                        html += '</tr><tr>';
+
+                    html +=
+                        '<td>' +
+                            '<div class="showcase_item">' +
+                                aboutme.photo.getPhotoLink(o.pkey, aboutme.photo.num++) +
+                                '<div class="blackbg blackbg_' + i + '">&nbsp;</div>' +
+                                '<div class="label">' + o.datetime + '</div>' +
+                            '</div>' +
+                        '</td>'
+
+                    if (i == idx)
+                         html += '</tr></table>';
                 });
+
+                $('div.showcase_container').append(html);
+
+                // init fancy box
+                data.forEach(function(o, i){
+                    aboutme.photo.initFancyBox(i);
+                });
+
             }).fail(function(data){
                 console.log(data);
                 alert(['Your request cannot be processed, please try again later.<br>Ref. #' + 500]);
@@ -513,13 +522,11 @@ var util = {
         if (!val) return true;
         return typeof val == 'string'? val.trim().length < 1: val.length < 1;
     },
-    bigImg: function(x){
-        x.style.height= "auto";
-        x.style.width="220px";
-    },
-    normalImg: function(x){
-        x.style.height= "auto";
-        x.style.width= "200px";
+    resize: function(x, type){
+        var img = $(x);
+        img.css('height', "auto");
+        img.css('width', (type == 1? 210: type == 2? 400: 200) + 'px');
+        $('div.' + img.attr('id').replace('image_', 'blackbg_')).css('right', (type == 1? 10: 20) + 'px');
     }
 };
 
