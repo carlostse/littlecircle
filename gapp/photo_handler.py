@@ -95,8 +95,8 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
 
 class ImageSearchHandler(webapp2.RequestHandler):
     def get(self):
-        event = self.request.get('event')
-        logging.info("[ImageSearchHandler] event: {}".format(event))
+        #event = self.request.get('event')
+        #logging.info("[ImageSearchHandler] event: {}".format(event))
 
         list = littlecircle.Photo.query(
         littlecircle.Photo.deletedDate == None).order(

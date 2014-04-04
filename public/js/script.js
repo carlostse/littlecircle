@@ -231,13 +231,22 @@ var aboutme = {
         });
         */
     },
-    chat: function(){
-        var msg = $('textarea.chat_message').val();
-        if (msg){
-            var send = {user: aboutme.user, message: msg};
-            console.log(JSON.stringify(send));
-            console.log(send.user.name + ': ' + send.message);
-            aboutme.socket.emit('chat', send);
+    chat: {
+        keydown: function(e){
+            if (e.keyCode == 13){
+                aboutme.chat.send();
+            }
+        },
+        send: function(){
+            var box = $('input.chat_message');
+            var msg = box.val();
+            if (msg){
+                var send = {user: aboutme.user, message: msg};
+                console.log(JSON.stringify(send));
+                console.log(send.user.name + ': ' + send.message);
+                aboutme.socket.emit('chat', send);
+                box.val(null);
+            }
         }
     },
     login: function(uid){
@@ -248,16 +257,16 @@ var aboutme = {
         FB.api('/' + uid, function(response) {
             console.log('[login] /' + uid + ': ' + JSON.stringify(response) + '.');
             aboutme.user.syncFacebookUser(response);
-            console.log(aboutme.user.name + "'s birthday: " + aboutme.user.birthday);
+            //console.log(aboutme.user.name + "'s birthday: " + aboutme.user.birthday);
             aboutme.socket.emit('online', aboutme.user);
 
             // sync user
-            aboutme.userSync(aboutme.loadEvent);
+            aboutme.userSync();
 
             // login to little circle to get session ID
             aboutme.userLogin(function(){
                 // load photo after login
-                aboutme.photo.search({ event: '1', sid: aboutme.user.sid});
+                aboutme.photo.search({ sid: aboutme.user.sid});
             });
         });
 //      console.log('loading friends');

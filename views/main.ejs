@@ -28,8 +28,8 @@
 	<br>
 	<div>
 		<br>
-		<textarea placeholder="Chat here:" type="text" class="chat_message"></textarea><br>
-		<button class="button_send" onclick="aboutme.chat();">Send</button>
+		<input placeholder="Chat here..." type="text" class="chat_message" onkeydown="aboutme.chat.keydown(event);"><br>
+		<button class="button_send" onclick="aboutme.chat.send();">Send</button>
 	</div>
 	<div class="chat_history"></div>
 </div>
