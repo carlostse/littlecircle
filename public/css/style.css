@@ -2,8 +2,10 @@ html {
     padding: 0px;
 }
 body {
-    padding: 0px;
-    font: 14px 'Duru Sans', sans-serif;
+    background-image:url('/img/bg_main.jpg');
+    background-repeat:no-repeat;
+    background-attachment:fixed;
+    background-size: cover;
 }
 .index {
     margin: 10px 0px;
@@ -15,17 +17,19 @@ body {
     height: 407px;
     width: 628px;
     margin: 0px auto;
-    background-image:url('/img/logo.png');
+    background-image:url('/img/logo.png') ;
     background-repeat: no-repeat;
+    z-index: -1;
 }
 .index .logo  img {
     padding: 220px 0px 0px 0px;
 }
 .index .fb-login-button {
-    margin-left: 170px;
+    margin-left: 170px ;
+    text-align: center;
 }
 .chatbase {
-    background-color: #B8E4EF;
+    /*background-color: #B8E4EF;*/
     position: absolute;
     height: auto;
     left: 77%;
@@ -33,14 +37,14 @@ body {
     top: 15px;
     bottom: 25px;
     display: block;
-    box-shadow: 0px 12px 12px rgba(0, 0, 0, 0.5);
+    box-shadow: 0px 15px 15px rgba(0, 0, 0, 0.5);
     padding-top:10px;
     padding-left:10px;
     padding-bottom:10px;
     padding-right:10px;
 }
 .gallerybase {
-    background-color: #2B84B3;
+    /*background-color: #2B84B3;*/
     position: absolute;
     height: auto;
     left: 2%;
@@ -48,18 +52,21 @@ body {
     top: 15px;
     bottom: 25px;
     display: block;
-    box-shadow: 0px 12px 12px rgba(0, 0, 0, 0.5);
-    padding: 10px;
+    box-shadow: 0px 15px 15px rgba(0, 0, 0, 0.5);
+    padding-top:10px;
+    padding-left:10px;
+    padding-bottom:10px;
+    padding-right:10px;
 }
 div.showcase_item {
     position: relative;
     width: 220px;
-    height: auto;
+    height: 170px;
     float: left;
     margin-left: 2%;
     margin-bottom: 2%;
     overflow: hidden;
-    top: 10px;
+    top:10px;
 }
 div.showcase_item img { z-index: 1; }
 div.showcase_item div {
@@ -134,10 +141,12 @@ div.showcase_item div.label {
     height: 22px;
     font-size: 16px;
     font-weight: normal;
-    border: 1px solid #2B84B3;
+    border: 1px solid white;
     color: white;
     cursor: pointer;
     border-radius: 3px;
+    font-family:Arial,Helvetica,sans-serif;
+    background: transparent;
 }
 #logout_button {
     width: 100px;
@@ -145,16 +154,30 @@ div.showcase_item div.label {
     height: 22px;
     font-size: 16px;
     font-weight: normal;
-    border: 1px solid #2B84B3;
+    border: 1px solid white;
     color: white;
     cursor: pointer;
     border-radius: 3px;
+    font-family:Arial,Helvetica,sans-serif;
+    background: transparent;
 }
 .chat_message {
     width:100%;
     left:5%;
     right:5%;
     height:50px;
+    background: transparent;
+    color: white;
+    font-size: 16px;
+    font-weight: normal;
+    border: 1px solid white;
+    font-family:Arial,Helvetica,sans-serif;
+}
+.chat_history{
+    font-family:Arial,Helvetica,sans-serif;
+    color: white;
+    font-size: 16px;
+    font-weight: normal;
 }
 img.add_event {
     width: 200px;
