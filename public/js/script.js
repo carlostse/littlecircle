@@ -211,6 +211,14 @@ var aboutme = {
             FB.getLoginStatus(facebook.loginCallback('main'));
         });
 
+        // init upload fancy box
+        $('a.create_event').fancybox({
+            'transitionIn' : 'fade',
+            'transitionOut': 'fade',
+            'enableEscapeButton': false,
+            'hideOnOverlayClick': false
+        });
+                
         // prepare upload photo
         aboutme.upload.prepare();
 
@@ -369,8 +377,6 @@ var aboutme = {
     upload: {
         url: '',
         prepare: function(){
-            var form = $('form.form_upload');
-            form.hide();
             $.ajax({
                 type: "GET",
                 url: aboutme.path.upload_url
@@ -380,7 +386,7 @@ var aboutme = {
                     return;
                 }
                 aboutme.upload.url = data;
-                form.show();
+                $('a.create_event').css('visibility', 'visible');
             });
         },
         validate: function(){
@@ -441,6 +447,9 @@ var aboutme = {
 
             // close the create box
             $.fancybox.close();
+
+            // hide the upload button and wait for the new upload session
+            $('a.create_event').css('visibility', 'visible');
 
             // get new upload URL
             aboutme.upload.prepare();

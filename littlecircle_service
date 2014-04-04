@@ -21,7 +21,7 @@ start() {
         PID=`ps -ef | grep node | grep $SERV_MAIN | awk '{print $2}'`
         if [ "$PID" == "" ]; then
             cd $SERV_PATH
-            sh -c `/opt/node/bin/node $SERV_MAIN > log.txt` &
+            sh `/opt/node/bin/node $SERV_MAIN > log.txt` &
             sleep 2
             PID=`ps -ef | grep node | grep $SERV_MAIN | awk '{print $2}'`
             if [ "$PID" == "" ]; then

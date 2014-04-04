@@ -114,7 +114,21 @@ div.showcase_item div.geo a {
     font-family:"Open Sans", "lucida grande", "Segoe UI", arial, verdana, "lucida sans unicode", tahoma, sans-serif;
     border-radius: 3px;
 }
-#button_upload {
+div.create_event_box {
+    display:none;
+}
+div.create_event {
+    width: 600px;
+    overflow: auto;
+}
+div.create_event table {
+    width: 100%;
+    border: solid 1px;
+}
+a.create_event {
+    visibility: hidden;
+}
+button.upload {
     width: 100px;
     background: -webkit-gradient(linear, left top, left bottom, from(#2B84B3), to(#3B5898));
     height: 22px;
@@ -194,17 +208,6 @@ table.chat_history td{
 img.add_event {
     width: 200px;
     height: 200px;
-}
-div.create_event_box {
-    display:none;
-}
-div.create_event {
-    width: 600px;
-    overflow: auto;
-}
-div.create_event table {
-    width: 100%;
-    border: solid 1px;
 }
 img.banner {
     position:absolute;

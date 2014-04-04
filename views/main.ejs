@@ -18,15 +18,12 @@
 		data-scope="email, user_birthday, user_friends, publish_actions"
 		data-max-rows="1" data-size="large"
 		data-show-faces="true" data-auto-logout-link="false"></div>
-    <br>
-    <br>
+	<br><br>
 	<button id="logout_button" onclick="aboutme.logout();">Logout</button>
 	<div class="event"></div>
-	<br>
-	<br>
-	<button id="button_upload" >Upload</button>
-	<br>
-    <br>
+	<br><br>
+	<a href="#create_event" class="create_event"><button class="upload">Upload</button></a>
+	<br><br>
 	<div>
 		<br>
 		<textarea placeholder="Chat here..." class="chat_message" onkeydown="aboutme.chat.keydown(this, event);"></textarea>
@@ -46,27 +43,8 @@
 <div class="create_event_box">
 	<div id="create_event" class="create_event">
 		<form enctype="multipart/form-data" class="form_upload">
-		<table style="width:600px; border:0px;">
-			<tr>
-				<td style=" color: #2B84B3;    " >Event Name:</td>
-				<td><input type="text"></td>
-			</tr>
-			<tr>
-				<td style=" color: #2B84B3;    ">Event Date:</td>
-				<td><input type="text"></td>
-			</tr>
-			<tr>
-				<td style=" color: #2B84B3;    ">Event Location:</td>
-				<td><input type="text"></td>
-			</tr>
-			<tr>
-				<td style="vertical-align:top; color: #2B84B3;">Event Description:</td>
-				<td><textarea style="width:300px;height:100px;"></textarea></td>
-			</tr>
-            </table>
-			<br>
-				<input name="file" type="file" class="file_upload" value="Upload"><!-- <progress></progress> -->
-				<input type="button" value="Upload" class="button_upload" onclick="aboutme.upload.action();">
+			<input name="file" type="file" class="file_upload" value="Upload"><!-- <progress></progress> -->
+			<input type="button" value="Upload" class="button_upload" onclick="aboutme.upload.action();">
 		</form>
 	</div>
 </div>
