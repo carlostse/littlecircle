@@ -29,11 +29,11 @@
     <br>
 	<div>
 		<br>
-		<input placeholder="Chat here..." type="text" class="chat_message" onkeydown="aboutme.chat.keydown(event);"><br>
-        <br>
+		<textarea placeholder="Chat here..." class="chat_message" onkeydown="aboutme.chat.keydown(this, event);"></textarea>
+		<br><br>
 		<button class="button_send" onclick="aboutme.chat.send();">Send</button>
 	</div>
-	<div class="chat_history"></div>
+	<div class="chat_history"><table class="chat_history"></table></div>
 </div>
 
 <div class="gallerybase">

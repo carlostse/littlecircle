@@ -50,14 +50,14 @@ io.sockets.on('connection', function (socket) {
         if (data && data.name){
             var name = data.name;
             online.addUser(name);
-            io.sockets.emit('message', name + ' is online');
+            io.sockets.emit('online', name);
             routes.log('io.sockets', 'current online: ' + JSON.stringify(online.users));
         }
     });
     socket.on('chat', function (data) {
         routes.log('io.sockets', 'chat: ' + JSON.stringify(data));
         if (data && data.user && data.message)
-            io.sockets.emit('message', data.user.name + ': ' + data.message);
+            io.sockets.emit('message', JSON.stringify({user: data.user.name, message: data.message}));
     });
     socket.on('disconnect', function() {
         routes.log('io.sockets', 'someone disconnect');

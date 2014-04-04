@@ -174,7 +174,7 @@ div.showcase_item div.geo a {
     width:100%;
     left:5%;
     right:5%;
-    height:25px;
+    height:50px;
     background: transparent;
     color: white;
     font-size: 16px;
@@ -182,11 +182,14 @@ div.showcase_item div.geo a {
     border: 1px solid white;
     font-family:Arial,Helvetica,sans-serif;
 }
-.chat_history{
+div.chat_history{
     font-family:Arial,Helvetica,sans-serif;
     color: white;
     font-size: 16px;
     font-weight: normal;
+}
+table.chat_history td{
+    vertical-align: top;
 }
 img.add_event {
     width: 200px;

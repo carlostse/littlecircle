@@ -218,35 +218,48 @@ var aboutme = {
         var socket = 'http://' + aboutme.domain + ':' + aboutme.socketPort;
         console.log('connect ' + socket);
         aboutme.socket = io.connect(socket);
-        aboutme.socket.on('message', function (data) {
-            console.log('message: ' + data);
-            if (data) {
-                $('div.chat_history').append(data + '<br>');
-            }
-        });
-        /*
-        aboutme.socket.on('alive', function() {
-            aboutme.socket.emit('offline', aboutme.user);
-            alert('emit offline: ' + JSON.stringify(aboutme.user));
-        });
-        */
+        aboutme.socket.on('message', aboutme.chat.receive);
+        aboutme.socket.on('online', aboutme.chat.online);
+//        aboutme.socket.on('alive', function() {
+//            aboutme.socket.emit('offline', aboutme.user);
+//            alert('emit offline: ' + JSON.stringify(aboutme.user));
+//        });
     },
     chat: {
-        keydown: function(e){
-            if (e.keyCode == 13){
+        keydown: function(obj, e){
+            if (e.keyCode == 13 && !e.shiftKey){
                 aboutme.chat.send();
+                e.preventDefault();
             }
         },
         send: function(){
-            var box = $('input.chat_message');
+            var box = $('textarea.chat_message');
             var msg = box.val();
             if (msg){
                 var send = {user: aboutme.user, message: msg};
                 console.log(JSON.stringify(send));
                 console.log(send.user.name + ': ' + send.message);
                 aboutme.socket.emit('chat', send);
-                box.val(null);
+                box.val('');
             }
+        },
+        receive: function (data){
+            console.log('message: ' + data);
+            if (!data) return;
+            var obj = JSON.parse(data);
+            if (!obj.user || !obj.message) return;
+            $('table.chat_history').append(
+                '<tr>' +
+                    '<td>' + obj.user + '</td>' +
+                    '<td>:</td>' +
+                    '<td>' + obj.message.replace('\n', '<br>') + '</td>' +
+                '</tr>'
+            );
+        },
+        online: function (data){
+            console.log('online: ' + data);
+            if (!data) return;
+            $('table.chat_history').append('<tr><td colspan="3">' + data + ' is online</td></tr>');
         }
     },
     login: function(uid){
@@ -286,10 +299,10 @@ var aboutme = {
             });
         });
     },
+    /*
     loadEvent: function(){
         var html = '';
         if (aboutme.user.fb_id){
-            /*
             console.log('[loadEvent] load from server');
             $.ajax({
                 type: "GET",
@@ -308,7 +321,6 @@ var aboutme = {
                 });
                 $('div.event').html(html);
             });
-            */
         }
         $('div.event').html(html);
     },
@@ -324,7 +336,7 @@ var aboutme = {
         //aboutme.pushPost(event);
         console.log(aboutme.socket);
         aboutme.socket.emit('send', {message: event.title});
-        /*
+
         $.ajax({
             type: "GET",
             url: aboutme.path.event_create,
@@ -341,8 +353,8 @@ var aboutme = {
             location.val(null);
             aboutme.loadEvent();
         });
-        */
     },
+    */
     pushPost: function(event){
         console.log('push post to facebook');
         var msg = aboutme.user.name + ' is ' + event.title + ' at ' + event.location;
@@ -387,16 +399,8 @@ var aboutme = {
 //                return;
 //            }
 
-            var event = JSON.stringify({
-                name: 'event',
-                date: '2014/04/02',
-                location: 'Hong Kong',
-                desc: ''
-            });
-
             var formData = new FormData($('form.form_upload')[0]);
             formData.append('sid', aboutme.user.sid);
-            formData.append('event', event);
             $.ajax({
                 url: aboutme.upload.url,
                 type: 'POST',
@@ -423,8 +427,8 @@ var aboutme = {
             });
         },
         progressCallback: function(e){
-            //if (e.lengthComputable)
-            //    $('progress').attr({value:e.loaded,max:e.total});
+//          if (e.lengthComputable)
+//              $('progress').attr({value:e.loaded, max:e.total});
         },
         successCallback: function (data){
             if (!data){
@@ -480,11 +484,9 @@ var aboutme = {
                 }
 
                 var html = ''; // cannot append to div directly due to threading problem
-
-                var maps = [];
+                var maps = [], idx = data.length - 1;
 
                 // display photo
-                var idx = data.length - 1;
                 data.forEach(function(o, i){
                     if (i == 0)
                         html += '<table><tr>';
@@ -505,7 +507,7 @@ var aboutme = {
                         '</td>'
 
                     if (i == idx)
-                         html += '</tr></table>';
+                        html += '</tr></table>';
                 });
 
                 $('div.showcase_container').append(html);
@@ -533,7 +535,7 @@ var aboutme = {
         }
     },
     string: {
-        confirm_upload: 'Are you sure?'
+//        confirm_upload: 'Are you sure?'
     }
 };
 
