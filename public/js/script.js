@@ -424,7 +424,7 @@ var aboutme = {
             }
             // append the new uploaded photo
             $('div.gallery').append(aboutme.photo.getPhotoLink(data, aboutme.photo.num));
-            aboutme.photo.initFancyBox(aboutme.photo.num++);
+            aboutme.photo.initFancyBox('image', aboutme.photo.num++);
 
             // close the create box
             $.fancybox.close();
@@ -469,7 +469,10 @@ var aboutme = {
                     alert(['Your request cannot be processed, please try again later.<br>Ref. #' + 500]);
                     return;
                 }
+
                 var html = ''; // cannot append to div directly due to threading problem
+
+                var maps = [];
 
                 // display photo
                 var idx = data.length - 1;
@@ -479,12 +482,16 @@ var aboutme = {
                     else if (i % 4 == 0)
                         html += '</tr><tr>';
 
+                    if (o.geo)
+                        maps.push(i);
+
                     html +=
                         '<td>' +
                             '<div class="showcase_item">' +
                                 aboutme.photo.getPhotoLink(o.pkey, aboutme.photo.num++) +
                                 '<div class="blackbg blackbg_' + i + '">&nbsp;</div>' +
-                                '<div class="label">' + o.datetime + '</div>' +
+                                '<div class="datetime">' + o.datetime + '</div>' +
+                                (o.geo? '<div class="geo"><a id="map_' + i + '" href="/app/map/' + o.geo + '">show map</a></div>': '') +
                             '</div>' +
                         '</td>'
 
@@ -496,7 +503,11 @@ var aboutme = {
 
                 // init fancy box
                 data.forEach(function(o, i){
-                    aboutme.photo.initFancyBox(i);
+                    aboutme.photo.initFancyBox('image', i);
+                });
+
+                maps.forEach(function(o){
+                    aboutme.photo.initFancyBox('map', o, 'iframe');
                 });
 
             }).fail(function(data){
@@ -504,9 +515,9 @@ var aboutme = {
                 alert(['Your request cannot be processed, please try again later.<br>Ref. #' + 500]);
             });
         },
-        initFancyBox: function(index){
-            $('a#img_' + index).fancybox({
-                'type'          : 'image',
+        initFancyBox: function(tag, index, type){
+            $('a#' + tag + '_' + index).fancybox({
+                'type'          : type? type: tag,
                 'transitionIn'  : 'elastic',
                 'transitionOut' : 'elastic'
             });

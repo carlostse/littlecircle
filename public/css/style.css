@@ -84,10 +84,18 @@ div.showcase_item div.blackbg {
     filter: alpha(opacity=50);
     opacity: 0.5;
 }
-div.showcase_item div.label {
+div.showcase_item div.datetime {
     z-index: 3;
     color: white;
     font-size: 10pt;
+}
+div.showcase_item div.geo {
+    z-index: 4;
+    text-align: right;
+}
+div.showcase_item div.geo a {
+   text-decoration: none;
+   color: white;
 }
 .showimg {
     width: 200px;
@@ -195,11 +203,11 @@ div.create_event table {
     border: solid 1px;
 }
 img.banner {
-    position:absolute; 
-    right:1%; 
-    bottom:1%; 
-    width: 200px; 
-    cursor:pointer; 
+    position:absolute;
+    right:1%;
+    bottom:1%;
+    width: 200px;
+    cursor:pointer;
     height: auto;
 }
 /* alert dialog */
