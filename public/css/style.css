@@ -114,17 +114,18 @@ div.showcase_item div.geo a {
     font-family:"Open Sans", "lucida grande", "Segoe UI", arial, verdana, "lucida sans unicode", tahoma, sans-serif;
     border-radius: 3px;
 }
-.button_upload {
+#button_upload {
+    width: 100px;
     background: -webkit-gradient(linear, left top, left bottom, from(#2B84B3), to(#3B5898));
-    width: 30%;
-    height: 32px;
+    height: 22px;
     font-size: 16px;
     font-weight: normal;
-    border: 1px solid #2B84B3;
+    border: 1px solid white;
     color: white;
     cursor: pointer;
     border-radius: 3px;
-    padding-right:10px;
+    font-family:Arial,Helvetica,sans-serif;
+    background: transparent;
 }
 .title {
     width:95%;
