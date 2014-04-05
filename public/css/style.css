@@ -201,6 +201,21 @@ div.chat_history{
     color: white;
     font-size: 16px;
     font-weight: normal;
+    border: 1px solid #CDCDCD;
+    height: 250px;
+}
+div.chat_head{
+	padding:3px 3px;
+	background-color: #d9edf7;
+}
+h1{
+    margin:0px;
+	font-size:20px;
+	color: #31708f;
+}
+div.chat_div{
+	font-family:inherit;
+	font-weight:50;
 }
 table.chat_history td{
     vertical-align: top;

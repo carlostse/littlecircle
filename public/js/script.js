@@ -86,7 +86,7 @@ var facebook = {
         console.log(response);
     }
 };
-
+var history=new Array();
 var aboutme = {
     domain: 'project.aboutme.com.hk',
     path: {
@@ -251,23 +251,43 @@ var aboutme = {
                 box.val('');
             }
         },
+        
         receive: function (data){
             console.log('message: ' + data);
             if (!data) return;
             var obj = JSON.parse(data);
             if (!obj.user || !obj.message) return;
-            $('table.chat_history').append(
-                '<tr>' +
+            var string='<tr>' +
                     '<td>' + obj.user + '</td>' +
                     '<td>:</td>' +
                     '<td>' + obj.message.replace('\n', '<br>') + '</td>' +
                 '</tr>'
-            );
+            var i;
+            if(history.length<10)
+            {
+            	history[history.length]=string;
+            }
+            else
+            {
+				for(i=0; i<history.length; i++)
+				{
+					history[i]=history[i+1];
+				}       
+            	history[history.length-1]=string;
+            }
+            $('table.chat_history').empty();
+			for(i=0;i<history.length;i++)
+			{	
+				$('table.chat_history').append(history[i]);
+			}
         },
         online: function (data){
             console.log('online: ' + data);
             if (!data) return;
-            $('table.chat_history').append('<tr><td colspan="3">' + data + ' is online</td></tr>');
+            var online_s='<tr><td colspan="3">' + data +
+            		' is online</td></tr>';
+            $('table.chat_history').append(online_s);
+            history[history.length] = online_s;
         }
     },
     login: function(uid){
