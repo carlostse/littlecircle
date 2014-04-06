@@ -86,7 +86,7 @@ var facebook = {
         console.log(response);
     }
 };
-var history=new Array();
+
 var aboutme = {
     domain: 'project.aboutme.com.hk',
     path: {
@@ -99,8 +99,9 @@ var aboutme = {
         photo_search: '/gapp/search',
         photo_view: '/gapp/view'
     },
-    socket: null,
+    maxChatHistory: 10,
     socketPort: 3000,
+    socket: null,
     user: {
         sid: 0, // it won't be 0
         getName: function(){
@@ -234,6 +235,7 @@ var aboutme = {
 //        });
     },
     chat: {
+        history: [],
         keydown: function(obj, e){
             if (e.keyCode == 13 && !e.shiftKey){
                 aboutme.chat.send();
@@ -251,43 +253,44 @@ var aboutme = {
                 box.val('');
             }
         },
-        
         receive: function (data){
             console.log('message: ' + data);
             if (!data) return;
             var obj = JSON.parse(data);
-            if (!obj.user || !obj.message) return;
-            var string='<tr>' +
-                    '<td>' + obj.user + '</td>' +
-                    '<td>:</td>' +
-                    '<td>' + obj.message.replace('\n', '<br>') + '</td>' +
+            if (!obj.user || !obj.time || !obj.user || !obj.message) return;
+            aboutme.chat.history.push(
+                '<tr>' +
+                    '<td class="col_1">' + obj.user + '</td>' +
+                    '<td class="col_2">:</td>' +
+                    '<td class="col_3">' + obj.message.replace('\n', '<br>') + '</td>' +
                 '</tr>'
-            var i;
-            if(history.length<10)
-            {
-            	history[history.length]=string;
-            }
-            else
-            {
-				for(i=0; i<history.length; i++)
-				{
-					history[i]=history[i+1];
-				}       
-            	history[history.length-1]=string;
-            }
-            $('table.chat_history').empty();
-			for(i=0;i<history.length;i++)
-			{	
-				$('table.chat_history').append(history[i]);
-			}
+            );
+            aboutme.chat.reload();
         },
         online: function (data){
             console.log('online: ' + data);
             if (!data) return;
-            var online_s='<tr><td colspan="3">' + data +
-            		' is online</td></tr>';
-            $('table.chat_history').append(online_s);
-            history[history.length] = online_s;
+             var obj = JSON.parse(data);
+             if (!obj.user || !obj.time || !obj.user) return;
+            aboutme.chat.history.push(
+                '<tr>' + 
+                    '<td class="col_1">[' + obj.time + ']</td>' +
+                    '<td class="col_4" colspan="2">' + obj.user + ' is online</td>' + 
+                '</tr>'
+            );
+            aboutme.chat.reload();
+        },
+        reload: function (){
+            console.log('chat.history.length: ' + aboutme.chat.history.length);
+            if (aboutme.chat.history.length >  aboutme.maxChatHistory)
+                aboutme.chat.history = aboutme.chat.history.slice(1, aboutme.maxChatHistory + 1);
+            var tbl = $('table.chat_history');
+            tbl.empty();
+//          for (var i = aboutme.chat.history.length - 1; i > -1; i--)
+//              tbl.append(aboutme.chat.history[i]);
+            aboutme.chat.history.forEach(function (o, i){
+                tbl.append(o);
+            });
         }
     },
     login: function(uid){

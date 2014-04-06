@@ -7,6 +7,11 @@ body {
     background-attachment:fixed;
     background-size: cover;
 }
+h1{
+    margin:0px;
+    font-size:20px;
+    color: #31708f;
+}
 .index {
     margin: 10px 0px;
     width: 100%;
@@ -205,20 +210,21 @@ div.chat_history{
     height: 250px;
 }
 div.chat_head{
-	padding:3px 3px;
-	background-color: #d9edf7;
-}
-h1{
-    margin:0px;
-	font-size:20px;
-	color: #31708f;
+    padding:3px 3px;
+    background-color: #d9edf7;
 }
 div.chat_div{
-	font-family:inherit;
-	font-weight:50;
+    font-family:inherit;
+    font-weight:50;
 }
 table.chat_history td{
     vertical-align: top;
+}
+table.chat_history .col_1{
+    white-space: nowrap;
+}
+table.chat_history .col_2{
+    width: 5px;
 }
 img.add_event {
     width: 200px;
