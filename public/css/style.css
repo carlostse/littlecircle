@@ -317,4 +317,13 @@ img.icon {
     top: 40px;
     width: 90px;
 }
+div.gallery_head {
+    font-size: 30px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    margin-left: 10px;
+}
+h2 {
+    margin: 0px;
+}
 /* end - alert dialog */
