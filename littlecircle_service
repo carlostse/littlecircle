@@ -42,7 +42,7 @@ stop() {
         else
             kill $PID
             sleep 2
-            PID=`ps -ef | grep node | grep -v grep | grep node_spdy.js | awk '{print $2}'`
+            PID=`ps -ef | grep node | grep $SERV_MAIN | awk '{print $2}'`
             if [ "$PID" == "" ]; then
                 echo "$SERV_NAME stopped"
             else
