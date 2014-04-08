@@ -1,6 +1,6 @@
 var facebook = {
     loginCallback: function(page){
-        console.log('page: ' + page);
+        console.log('[facebook] page: ' + page);
         if (page == 'index'){
             FB.getLoginStatus(function(response) {
                 if (response.status === 'connected') {
@@ -88,7 +88,7 @@ var facebook = {
 };
 
 var aboutme = {
-    domain: 'project.aboutme.com.hk',
+    domain: window.location.hostname,
     path: {
         index: '/',
         main: '/app/main',
@@ -225,14 +225,16 @@ var aboutme = {
 
         // web socket
         var socket = 'http://' + aboutme.domain + ':' + aboutme.socketPort;
-        console.log('connect ' + socket);
-        aboutme.socket = io.connect(socket);
-        aboutme.socket.on('message', aboutme.chat.receive);
-        aboutme.socket.on('online', aboutme.chat.online);
-//        aboutme.socket.on('alive', function() {
-//            aboutme.socket.emit('offline', aboutme.user);
-//            alert('emit offline: ' + JSON.stringify(aboutme.user));
-//        });
+        util.loadScript(socket + '/socket.io/socket.io.js', function(){
+            console.log('[main] connect ' + socket);
+            aboutme.socket = io.connect(socket);
+            aboutme.socket.on('message', aboutme.chat.receive);
+            aboutme.socket.on('online', aboutme.chat.online);
+//          aboutme.socket.on('alive', function() {
+//              aboutme.socket.emit('offline', aboutme.user);
+//              alert('emit offline: ' + JSON.stringify(aboutme.user));
+//          });
+        });
     },
     chat: {
         history: [],
@@ -599,6 +601,24 @@ var util = {
         img.css('height', "auto");
         img.css('width', (type == 1? 210: type == 2? 400: 200) + 'px');
         $('div.' + img.attr('id').replace('img_', 'blackbg_')).css('right', (type == 1? 10: 20) + 'px');
+    },
+    loadScript: function(url, callback){
+        console.log('[loadScript] ' + url);
+        // add script tag to the head
+        var head = document.getElementsByTagName('head')[0];
+        var script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.src = url;
+
+        // bind the event to the callback function
+        // (several events for cross browser compatibility)
+        if (callback){
+            script.onreadystatechange = callback;
+            script.onload = callback;
+        }
+
+        // fire the loading
+        head.appendChild(script);
     }
 };
 
