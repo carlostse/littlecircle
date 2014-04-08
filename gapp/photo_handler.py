@@ -14,6 +14,7 @@ import littlecircle
 
 LITTLECIRCLE_THUMBNAIL_W=200
 LITTLECIRCLE_PREVIEW_W=LITTLECIRCLE_THUMBNAIL_W*2
+LITTLECIRCLE_IMG_Q=90
 
 class UploadUrlHandler(webapp2.RequestHandler):
     def get(self):
@@ -52,7 +53,7 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         # make preview
         img = images.Image(blob_key=blob_key)
         img.resize(width=LITTLECIRCLE_PREVIEW_W)
-        preview = img.execute_transforms(output_encoding=images.JPEG, quality=90, parse_source_metadata=True)
+        preview = img.execute_transforms(output_encoding=images.JPEG, quality=LITTLECIRCLE_IMG_Q, parse_source_metadata=True)
 
         # try to get geo location and date time of the photo
         meta = img.get_original_metadata()
@@ -70,7 +71,7 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
 
         # make thumbnail
         img.resize(width=LITTLECIRCLE_THUMBNAIL_W)
-        thumb = img.execute_transforms(output_encoding=images.JPEG, quality=90)
+        thumb = img.execute_transforms(output_encoding=images.JPEG, quality=LITTLECIRCLE_IMG_Q)
 
         # save photo information
         p = littlecircle.Photo(
@@ -139,7 +140,7 @@ class ImageViewHandler(webapp2.RequestHandler):
                         logging.info("[ImageViewHandler] preview not found, try to make it")
                         fullImg = images.Image(blob_key=blob_key)
                         fullImg.resize(width=LITTLECIRCLE_PREVIEW_W)
-                        preview = fullImg.execute_transforms(output_encoding=images.JPEG, quality=90)
+                        preview = fullImg.execute_transforms(output_encoding=images.JPEG, quality=LITTLECIRCLE_IMG_Q)
                         if (preview is None):
                             raise Exception("[ImageViewHandler] cannot make preview: {}".format(blob_key))
 
@@ -167,7 +168,7 @@ class ImageViewHandler(webapp2.RequestHandler):
                         logging.info("[ImageViewHandler] thumbnail not found, try to make it")
                         fullImg = images.Image(blob_key=blob_key)
                         fullImg.resize(width=LITTLECIRCLE_THUMBNAIL_W)
-                        thumbnail = fullImg.execute_transforms(output_encoding=images.JPEG, quality=90)
+                        thumbnail = fullImg.execute_transforms(output_encoding=images.JPEG, quality=LITTLECIRCLE_IMG_Q)
                         if (thumbnail is None):
                             raise Exception("[ImageViewHandler] cannot make thumbnail: {}".format(blob_key))
 

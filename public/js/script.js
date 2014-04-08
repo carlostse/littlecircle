@@ -1,4 +1,5 @@
-var facebook = {
+var
+facebook = {
     loginCallback: function(page){
         console.log('[facebook] page: ' + page);
         if (page == 'index'){
@@ -85,9 +86,8 @@ var facebook = {
     logout: function(response) {
         console.log(response);
     }
-};
-
-var aboutme = {
+},
+aboutme = {
     domain: window.location.hostname,
     path: {
         index: '/',
@@ -332,62 +332,6 @@ var aboutme = {
             });
         });
     },
-    /*
-    loadEvent: function(){
-        var html = '';
-        if (aboutme.user.fb_id){
-            console.log('[loadEvent] load from server');
-            $.ajax({
-                type: "GET",
-                url: aboutme.path.event_query,
-                data: {
-                    user_id: aboutme.user.fb_id
-                }
-            }).done(function(data){
-                if (!data){
-                    alert(['Your request cannot be processed, please try again later.<br>Ref. #' + 500]);
-                    return;
-                }
-
-                data.forEach(function(obj, idx){
-                    html += obj.title + '@' + obj.location + '<br>';
-                });
-                $('div.event').html(html);
-            });
-        }
-        $('div.event').html(html);
-    },
-    saveEvent: function(){
-        var title = $('input.title')
-          , location = $('input.location')
-          , event = {
-                title: title.val(),
-                location: location.val(),
-          };
-
-        console.log(JSON.stringify(event));
-        //aboutme.pushPost(event);
-        console.log(aboutme.socket);
-        aboutme.socket.emit('send', {message: event.title});
-
-        $.ajax({
-            type: "GET",
-            url: aboutme.path.event_create,
-            data: {
-                user_id: aboutme.user.fb_id,
-                event: event
-            }
-        }).done(function(data){
-            if (!data){
-                alert(['Your request cannot be processed, please try again later.<br>Ref. #' + 500]);
-                return;
-            }
-            title.val(null);
-            location.val(null);
-            aboutme.loadEvent();
-        });
-    },
-    */
     pushPost: function(event){
         console.log('push post to facebook');
         var msg = aboutme.user.name + ' is ' + event.title + ' at ' + event.location;
@@ -503,18 +447,25 @@ var aboutme = {
     },
     photo: {
         num: 0,
+        selectedIndex: 0,
+        firstAffected: 1, 
+        secondAffected: 2,
+        numOfPhotoPerRow: 4,
+        originalWidth: 200,
         list: [],
-        getPhotoLink: function(id, index){
+        getPhotoLink: function(id, i){
             var
             p = aboutme.path.photo_view + '?sid=' + aboutme.user.sid + '&id=' + id,
             d = p + '&size=2';
-            return  '<a id="image_' + index + '" href="' + d + '">' +
-                        '<img src="' + p + '" class="showimg" id="img_' + index + '" onmouseout="util.resize(this, 0);" onmouseover="util.resize(this, 1);">' +
+            if (i == aboutme.photo.selectedIndex) p += '&size=1';
+            return  '<a id="image_' + i + '" href="' + d + '">' +
+                        '<img src="' + p + '" class="photo" id="img_' + i + '" ' +
+                        'onmouseout="util.resize(this, 0, ' + i + ');" onmouseover="util.resize(this, 1, ' + i + ');">' +
                     '</a>';
         },
         getPhotoCell: function(o, i){
-            return  '<td>' +
-                        '<div class="showcase_item">' +
+            return  '<td ' + (i == aboutme.photo.selectedIndex? 'colspan="2" rowspan="2"': '') + '>' +
+                        '<div class="photo">' +
                             aboutme.photo.getPhotoLink(o.pkey, i) +
                             '<div class="blackbg blackbg_' + i + '">&nbsp;</div>' +
                             '<div class="datetime">' + o.datetime + '</div>' +
@@ -549,26 +500,38 @@ var aboutme = {
                 'transitionOut' : 'elastic'
             });
         },
+        numOfPhotoInRow: function(row){
+            return row == aboutme.photo.firstAffected? aboutme.photo.numOfPhotoPerRow - 1: 
+                   row == aboutme.photo.secondAffected? aboutme.photo.numOfPhotoPerRow - 2: aboutme.photo.numOfPhotoPerRow;
+        },
         reload: function(){
             var html = '' // cannot append to div directly due to threading problem
               , maps = []
               , idx = aboutme.photo.list.length - 1;
 
             // display photo
+            var row = 1, col = 1;
             aboutme.photo.list.forEach(function(o, i){
-                if (i == 0)
-                    html += '<table><tr>';
-                else if (i % 4 == 0)
-                    html += '</tr><tr>';
+                // header
+                if (i == 0) html += '<table><tr>';
 
-                if (o.geo)
-                    maps.push(i);
-
+                // content
+                if (o.geo) maps.push(i);
                 html += aboutme.photo.getPhotoCell(o, i);
+                
+                // change row
+                if (col % aboutme.photo.numOfPhotoInRow(row) == 0){
+                    console.log('[reload] change row at (' + row + ', ' + col + '), index: ' + i);
+                    html += '</tr><tr>';
+                    row++;
+                    col = 0;
+                }
+                col++;
+                
+                // footer
+                if (i == idx) html += '</tr></table>';
 
-                if (i == idx)
-                    html += '</tr></table>';
-
+                // count
                 aboutme.photo.num++;
             });
 
@@ -581,6 +544,11 @@ var aboutme = {
                 aboutme.photo.initFancyBox('image', i);
             });
 
+            // adjust size
+            $('img.photo').each(function(i, o){
+                util.resize(o, 0, i);
+            });
+
             maps.forEach(function(o){
                 aboutme.photo.initFancyBox('map', o, 'iframe');
             });
@@ -589,17 +557,18 @@ var aboutme = {
     string: {
 //        confirm_upload: 'Are you sure?'
     }
-};
-
-var util = {
+},
+util = {
     isMissing: function(val){
         if (!val) return true;
         return typeof val == 'string'? val.trim().length < 1: val.length < 1;
     },
-    resize: function(x, type){
-        var img = $(x);
+    resize: function(x, type, i){
+        var img = $(x)
+          , w = type == 1? aboutme.photo.originalWidth * 1.05: type == 2? aboutme.photo.originalWidth * 2: aboutme.photo.originalWidth;
+        if (i == aboutme.photo.selectedIndex) w *= 2;
         img.css('height', "auto");
-        img.css('width', (type == 1? 210: type == 2? 400: 200) + 'px');
+        img.css('width', w + 'px');
         $('div.' + img.attr('id').replace('img_', 'blackbg_')).css('right', (type == 1? 10: 20) + 'px');
     },
     loadScript: function(url, callback){
@@ -621,7 +590,7 @@ var util = {
         head.appendChild(script);
     }
 };
-
+// override standard alert
 function alert(messages){
     var
     success = typeof messages == 'string',

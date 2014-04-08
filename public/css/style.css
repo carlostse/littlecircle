@@ -66,25 +66,25 @@ h2 {
     padding-bottom:10px;
     padding-right:10px;
 }
-div.showcase_item {
+div.photo {
     position: relative;
-    width: 220px;
-    height: 170px;
+    width: 100%;
+    height: auto;
     float: left;
     margin-left: 2%;
     margin-bottom: 2%;
     overflow: hidden;
     top:10px;
 }
-div.showcase_item img { z-index: 1; }
-div.showcase_item div {
+div.photo img { z-index: 1; }
+div.photo div {
     position: absolute;
     left: 0px;
     right: 20px;
     bottom: 4px;
     padding: 4px;
 }
-div.showcase_item div.blackbg {
+div.photo div.blackbg {
     z-index: 2;
     color: #000;
     background-color: #000;
@@ -92,20 +92,20 @@ div.showcase_item div.blackbg {
     filter: alpha(opacity=50);
     opacity: 0.5;
 }
-div.showcase_item div.datetime {
+div.photo div.datetime {
     z-index: 3;
     color: white;
     font-size: 10pt;
 }
-div.showcase_item div.geo {
+div.photo div.geo {
     z-index: 4;
     text-align: right;
 }
-div.showcase_item div.geo a {
+div.photo div.geo a {
    text-decoration: none;
    color: white;
 }
-.showimg {
+img.photo {
     width: 200px;
     cursor:pointer;
     box-shadow: 12px 12px 12px rgba(0, 0, 0, 0.5);
