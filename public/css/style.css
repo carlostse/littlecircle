@@ -57,7 +57,7 @@ h2 {
     height: auto;
     left: 2%;
     right: 25%;
-    top: 15px;
+    top: 25px;
     bottom: 25px;
     display: block;
     box-shadow: 0px 15px 15px rgba(0, 0, 0, 0.5);
@@ -112,15 +112,18 @@ div.showcase_item div.geo a {
     height: auto;
 }
 .file_upload {
-    width: 60%;
-    height: 28px;
-    font-size: 18px;
-    font-weight: normal;
-    border: 1px solid #2B84B3;
-    color: #2B84B3;
+    width: 80%;
+    height: 25px;
     cursor: pointer;
-    font-family:"Open Sans", "lucida grande", "Segoe UI", arial, verdana, "lucida sans unicode", tahoma, sans-serif;
+    font-size: 16px;
+    font-weight: normal;
+    border: 1px solid white;
+    color: white;
     border-radius: 3px;
+    font-family:Arial,Helvetica,sans-serif;
+    background: -webkit-gradient(linear, left top, right bottom, from(#4D7E8D), to(#E1855C));
+
+
 }
 div.create_event_box {
     display:none;
@@ -203,18 +206,43 @@ button.upload {
     font-weight: normal;
     border: 1px solid white;
     font-family:Arial,Helvetica,sans-serif;
+    border-radius: 3px;    
+}
+/* do not group these rules */
+*::-webkit-input-placeholder {
+  color: #E0E0E0;
+}
+*:-moz-placeholder {
+  color: #E0E0E0;
+}
+*:-ms-input-placeholder { /* IE10+ */
+  color: #E0E0E0;
 }
 div.chat_history{
     font-family:Arial,Helvetica,sans-serif;
     color: white;
     font-size: 16px;
     font-weight: normal;
-    border: 1px solid #CDCDCD;
+    border: 1px solid white;
     height: 250px;
+    border-radius: 3px;
 }
 div.chat_head{
-    padding:3px 3px;
-    background-color: #d9edf7;
+    padding:0px 0px;
+    background: transparent;
+    color: white;
+    font-size: 16px;
+    font-weight: normal;
+    font-family:Arial,Helvetica,sans-serif;
+}
+.chat_title{
+    padding:0px 0px;
+    background: transparent;
+    color: white;
+    font-size: 30px;
+    font-weight: normal;
+    font-family: 'Allura', cursive;
+
 }
 div.chat_div{
     font-family:inherit;
@@ -326,4 +354,41 @@ img.icon {
     top: 40px;
     width: 90px;
 }
+<<<<<<< HEAD
+.gallery_head{
+    position:absolute;
+    left:50px;
+    top:0px;
+
+}
+.gallery_title{
+    font-size: 50px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    margin-left: 10px;
+    color: white;
+    font-family: 'Allura', cursive;
+    font-style: normal;
+    font-weight: 400;
+}
+h2 {
+    margin: 0px;
+}
+.button_upload{
+    width: 100px;
+    font-weight: normal;
+    border: 1px solid white;
+    color: white;
+    border-radius: 3px;
+    font-family:Arial,Helvetica,sans-serif;
+    background: transparent;
+    background: -webkit-gradient(linear, left top, right bottom, from(#E1855C), to(#4D7E8D));
+    height: 25px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+
+=======
+>>>>>>> 9b508b3853218afc0318c57d9f4fb2283861460e
 /* end - alert dialog */
