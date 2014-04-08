@@ -41,13 +41,6 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
             self.error(401)
             return
 
-        #ev = self.request.get('event')
-        #logging.info("[UploadHandler] event: {}".format(ev))
-
-        #event = json.loads(ev, object_hook=littlecircle.Event.object_decoder)
-        #logging.info("[UploadHandler] user: {}, event: {}".format(user.name(), event.name))
-        #eventKey = event.put()
-
         upload_files = self.get_uploads('file')  # 'file' is file upload field in the form
         logging.info("[UploadHandler] upload_files: {}".format(upload_files))
 
@@ -60,7 +53,7 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         img = images.Image(blob_key=blob_key)
         img.resize(width=LITTLECIRCLE_PREVIEW_W)
         preview = img.execute_transforms(output_encoding=images.JPEG, quality=90, parse_source_metadata=True)
-        
+
         # try to get geo location and date time of the photo
         meta = img.get_original_metadata()
         logging.debug("[UploadHandler] meta: {}".format(meta))
@@ -74,13 +67,13 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
             loc = ndb.GeoPt(meta['GPSLatitude'], meta['GPSLongitude'])
 
         logging.info("[UploadHandler] photo taken at {} in location {}".format(dt, loc))
-        
+
         # make thumbnail
         img.resize(width=LITTLECIRCLE_THUMBNAIL_W)
         thumb = img.execute_transforms(output_encoding=images.JPEG, quality=90)
 
         # save photo information
-        littlecircle.Photo(
+        p = littlecircle.Photo(
             key=ndb.Key(littlecircle.Photo, str(blob_key)),
             owner=login.user,
             #event=eventKey,
@@ -89,9 +82,11 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
             photoDate=dt,
             preview=preview,
             thumbnail=thumb
-        ).put()
-
-        self.response.out.write(blob_key)
+        )
+        k = p.put()
+        logging.info("[UploadHandler] photo saved, key: {}".format(k.string_id()))
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.out.write(json.dumps(p.to_dict()))
 
 class ImageSearchHandler(webapp2.RequestHandler):
     def get(self):
@@ -104,14 +99,8 @@ class ImageSearchHandler(webapp2.RequestHandler):
 
         array = []
         for obj in list:
-            array.append({
-                'pkey': obj.key.id(),
-                'owner': obj.owner.string_id(),
-                'datetime': core_util.date_to_str(obj.photoDate),
-                'geo': core_util.geo_to_string(obj.geo)
-                #'event': obj.event.id()
-            })
-        logging.info("[ImageSearchHandler] array size: {}".format(len(array)))
+            array.append(obj.to_dict())
+        logging.info("[ImageSearchHandler] number of photo: {}".format(len(array)))
         self.response.headers['Content-Type'] = 'application/json'
         self.response.out.write(json.dumps(array))
 

@@ -12,6 +12,9 @@ h1{
     font-size:20px;
     color: #31708f;
 }
+h2 {
+    margin: 0px;
+}
 .index {
     margin: 10px 0px;
     width: 100%;
@@ -238,6 +241,12 @@ img.banner {
     cursor:pointer;
     height: auto;
 }
+div.gallery_head {
+    font-size: 30px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    margin-left: 10px;
+}
 /* loading dialog */
 div.loading {
     position: absolute;
@@ -316,14 +325,5 @@ img.icon {
     left: 10px;
     top: 40px;
     width: 90px;
-}
-div.gallery_head {
-    font-size: 30px;
-    margin-bottom: 5px;
-    margin-top: 5px;
-    margin-left: 10px;
-}
-h2 {
-    margin: 0px;
 }
 /* end - alert dialog */

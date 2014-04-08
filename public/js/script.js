@@ -273,9 +273,9 @@ var aboutme = {
              var obj = JSON.parse(data);
              if (!obj.user || !obj.time || !obj.user) return;
             aboutme.chat.history.push(
-                '<tr>' + 
+                '<tr>' +
                     '<td class="col_1">[' + obj.time + ']</td>' +
-                    '<td class="col_4" colspan="2">' + obj.user + ' is online</td>' + 
+                    '<td class="col_4" colspan="2">' + obj.user + ' is online</td>' +
                 '</tr>'
             );
             aboutme.chat.reload();
@@ -310,7 +310,7 @@ var aboutme = {
             // login to little circle to get session ID
             aboutme.userLogin(function(){
                 // load photo after login
-                aboutme.photo.search({ sid: aboutme.user.sid});
+                aboutme.photo.search({sid: aboutme.user.sid});
             });
         });
 //      console.log('loading friends');
@@ -431,11 +431,11 @@ var aboutme = {
             // prepare form data
             var formData = new FormData($('form.form_upload')[0]);
             formData.append('sid', aboutme.user.sid);
-            
+
             // close the upload box and show loading
             $.fancybox.close();
             $('div.loading').css('display', 'inline');
-            
+
             // submit
             $.ajax({
                 url: aboutme.upload.url,
@@ -471,8 +471,9 @@ var aboutme = {
                 alert(['Your request cannot be processed, please try again later.<br>Ref. #' + 500]);
                 return;
             }
-            // cannot append, have to re-load all
-            aboutme.photo.search({ sid: aboutme.user.sid});
+            // append and reload
+            aboutme.photo.list.push(data);
+            aboutme.photo.reload();
 
             // close the loading box
             $('div.loading').css('display', 'none');
@@ -500,6 +501,7 @@ var aboutme = {
     },
     photo: {
         num: 0,
+        list: [],
         getPhotoLink: function(id, index){
             var
             p = aboutme.path.photo_view + '?sid=' + aboutme.user.sid + '&id=' + id,
@@ -530,40 +532,8 @@ var aboutme = {
                     alert(['Your request cannot be processed, please try again later.<br>Ref. #' + 500]);
                     return;
                 }
-
-                var html = ''; // cannot append to div directly due to threading problem
-                var maps = [], idx = data.length - 1;
-
-                // display photo
-                data.forEach(function(o, i){
-                    if (i == 0)
-                        html += '<table><tr>';
-                    else if (i % 4 == 0)
-                        html += '</tr><tr>';
-
-                    if (o.geo)
-                        maps.push(i);
-
-                    html += aboutme.photo.getPhotoCell(o, i);
-
-                    if (i == idx)
-                        html += '</tr></table>';
-
-                    aboutme.photo.num++;
-                });
-
-                var div = $('div.showcase_container');
-                div.empty();
-                div.append(html);
-
-                // init fancy box
-                data.forEach(function(o, i){
-                    aboutme.photo.initFancyBox('image', i);
-                });
-
-                maps.forEach(function(o){
-                    aboutme.photo.initFancyBox('map', o, 'iframe');
-                });
+                aboutme.photo.list = data;
+                aboutme.photo.reload();
 
             }).fail(function(data){
                 console.log(data);
@@ -575,6 +545,42 @@ var aboutme = {
                 'type'          : type? type: tag,
                 'transitionIn'  : 'elastic',
                 'transitionOut' : 'elastic'
+            });
+        },
+        reload: function(){
+            var html = '' // cannot append to div directly due to threading problem
+              , maps = []
+              , idx = aboutme.photo.list.length - 1;
+
+            // display photo
+            aboutme.photo.list.forEach(function(o, i){
+                if (i == 0)
+                    html += '<table><tr>';
+                else if (i % 4 == 0)
+                    html += '</tr><tr>';
+
+                if (o.geo)
+                    maps.push(i);
+
+                html += aboutme.photo.getPhotoCell(o, i);
+
+                if (i == idx)
+                    html += '</tr></table>';
+
+                aboutme.photo.num++;
+            });
+
+            var div = $('div.showcase_container');
+            div.empty();
+            div.append(html);
+
+            // init fancy box
+            aboutme.photo.list.forEach(function(o, i){
+                aboutme.photo.initFancyBox('image', i);
+            });
+
+            maps.forEach(function(o){
+                aboutme.photo.initFancyBox('map', o, 'iframe');
             });
         }
     },

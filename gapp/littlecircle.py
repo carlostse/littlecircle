@@ -78,6 +78,11 @@ class Photo(ndb.Model):
     uploadDate = ndb.DateTimeProperty(auto_now_add=True)
     deletedBy = ndb.KeyProperty()
     deletedDate = ndb.DateTimeProperty()
+    def to_dict(self):
+        return {'pkey': self.key.id(),
+                'owner': self.owner.string_id(),
+                'datetime': core_util.date_to_str(self.photoDate),
+                'geo': core_util.geo_to_string(self.geo)}
 '''
 class Event(ndb.Model):
     # key: auto
