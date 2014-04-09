@@ -468,7 +468,7 @@ aboutme = {
                         '<div class="photo">' +
                             aboutme.photo.getPhotoLink(o.pkey, i) +
                             '<div class="blackbg blackbg_' + i + '">&nbsp;</div>' +
-                            '<div class="datetime">' + o.datetime + '</div>' +
+                            '<div class="datetime datetime_' + i + '">' + o.datetime + '</div>' +
                             (o.geo? '<div class="geo"><a id="map_' + i + '" href="/app/map/' + o.geo + '">show map</a></div>': '') +
                         '</div>' +
                     '</td>';
@@ -552,6 +552,11 @@ aboutme = {
             maps.forEach(function(o){
                 aboutme.photo.initFancyBox('map', o, 'iframe');
             });
+        },
+        showLabel: function(i, show){
+            var s = show? 'visible': 'hidden';
+            $('div.blackbg_' + i).css('visibility', s);
+            $('div.datetime_' + i).css('visibility', s); 
         }
     },
     string: {
@@ -566,16 +571,18 @@ util = {
     resize: function(x, type, i){
 //      console.log('[resize] type: ' + type + ', i: ' + i);
         var img = $(x)
-          , w = type == 1? aboutme.photo.originalWidth * 1.05: aboutme.photo.originalWidth
-          , r = type == 1? 10: 20;
+          , large = type == 1 || i == aboutme.photo.selectedIndex
+          , w = large? aboutme.photo.originalWidth * 1.05: aboutme.photo.originalWidth
+          , r = large? 10: 20;
         if (i == aboutme.photo.selectedIndex) {
             w *= 2;
             r *= 2.2;
-            if (type == 1) r += 2;
+            r += 2; // small adjustment
         }
-        img.css('height', "auto");
+        img.css('height', 'auto');
         img.css('width', w + 'px');
         $('div.' + img.attr('id').replace('img_', 'blackbg_')).css('right', r + 'px');
+        aboutme.photo.showLabel(i, type);
     },
     loadScript: function(url, callback){
         console.log('[loadScript] ' + url);
