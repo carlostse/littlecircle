@@ -454,22 +454,24 @@ aboutme = {
         originalWidth: 200,
         list: [],
         getPhotoLink: function(id, i){
-            var
-            p = aboutme.path.photo_view + '?sid=' + aboutme.user.sid + '&id=' + id,
-            d = p + '&size=2';
+            var p = aboutme.path.photo_view + '?sid=' + aboutme.user.sid + '&id=' + id;
             if (i == aboutme.photo.selectedIndex) p += '&size=1';
-            return  '<a id="image_' + i + '" href="' + d + '">' +
-                        '<img src="' + p + '" class="photo" id="img_' + i + '" ' +
-                            'onmouseover="aboutme.photo.resize(' + i + ');">' +
-                    '</a>';
+            return [p + '&size=2',
+                    '<img src="' + p + '" class="photo" id="img_' + i + '" ' +
+                        'onclick="aboutme.photo.click(' + i + ');" ' +
+                        'onmouseover="aboutme.photo.resize(' + i + ');">'];
         },
         getPhotoCell: function(o, i){
+            var links = aboutme.photo.getPhotoLink(o.pkey, i);
             return  '<td ' + (i == aboutme.photo.selectedIndex? 'colspan="2" rowspan="2"': '') + '>' +
                         '<div class="photo">' +
-                            aboutme.photo.getPhotoLink(o.pkey, i) +
+                            links[1] +
                             '<div class="blackbg blackbg_' + i + '">&nbsp;</div>' +
                             '<div class="datetime datetime_' + i + '">' + o.datetime + '</div>' +
-                            (o.geo? '<div class="geo geo_' + i + '"><a id="map_' + i + '" href="/app/map/' + o.geo + '">show map</a></div>': '') +
+                            '<div class="geo geo_' + i + '">' +
+                                '<a id="image_' + i + '" href="' + links[0] + '">full size</a>' +
+                                (o.geo? ' / <a id="map_' + i + '" href="/app/map/' + o.geo + '">show map</a>': '') +
+                            '</div>' +
                         '</div>' +
                     '</td>';
         },
@@ -563,6 +565,13 @@ aboutme = {
             $('img.photo').each(function(idx, img){
                 util.resize(img, idx == i? 1: 0, idx);
             });
+        },
+        click: function(i){
+            console.log('[click] i: ' + i);
+            var featured = aboutme.photo.list[0];
+            aboutme.photo.list[0] = aboutme.photo.list[i];
+            aboutme.photo.list[i] = featured;
+            aboutme.photo.reload();
         }
     },
     string: {

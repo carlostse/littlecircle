@@ -94,16 +94,20 @@ div.photo div.blackbg {
 }
 div.photo div.datetime {
     z-index: 3;
-    color: white;
-    font-size: 10pt;
+    color: #FFFFFF;
+    font-family: 'Ubuntu Condensed', cursive;
+    font-size: 11pt;
 }
 div.photo div.geo {
     z-index: 4;
     text-align: right;
+    color: #FFFFFF;
+    font-family: 'Ubuntu Condensed', cursive;
+    font-size: 11pt;
 }
 div.photo div.geo a {
    text-decoration: none;
-   color: white;
+   color: #FFFFFF;
 }
 img.photo {
     width: 200px; /* expandable to 210px */
@@ -246,7 +250,6 @@ div.chat_head{
     font-size: 30px;
     font-weight: normal;
     font-family: 'Allura', cursive;
-
 }
 div.chat_div{
     font-family:inherit;
