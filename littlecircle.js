@@ -44,7 +44,7 @@ var online = {
 
 io.sockets.on('connection', function (socket) {
     routes.log('io.sockets', 'socket connected');
-    socket.on('online', function (data) {
+    socket.on('online', function(data) {
         routes.log('io.sockets', 'new online: ' + JSON.stringify(data));
         if (data && data.name){
             var name = data.name;
@@ -53,10 +53,15 @@ io.sockets.on('connection', function (socket) {
             routes.log('io.sockets', 'current online: ' + JSON.stringify(online.users));
         }
     });
-    socket.on('chat', function (data) {
+    socket.on('chat', function(data) {
         routes.log('io.sockets', 'chat: ' + JSON.stringify(data));
         if (data && data.user && data.message)
             io.sockets.emit('message', JSON.stringify({time: moment().format('HH:mm:ss'), user: data.user.name, message: data.message}));
+    });
+    socket.on('photo', function(data) {
+        routes.log('io.sockets', 'photo: ' + JSON.stringify(data));
+        if (data && data.user && data.photo)
+            io.sockets.emit('photo', JSON.stringify({time: moment().format('HH:mm:ss'), user: data.user.name, photo: data.photo}));
     });
     socket.on('disconnect', function() {
         routes.log('io.sockets', 'someone disconnect');

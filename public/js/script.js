@@ -228,12 +228,9 @@ aboutme = {
         util.loadScript(socket + '/socket.io/socket.io.js', function(){
             console.log('[main] connect ' + socket);
             aboutme.socket = io.connect(socket);
-            aboutme.socket.on('message', aboutme.chat.receive);
             aboutme.socket.on('online', aboutme.chat.online);
-//          aboutme.socket.on('alive', function() {
-//              aboutme.socket.emit('offline', aboutme.user);
-//              alert('emit offline: ' + JSON.stringify(aboutme.user));
-//          });
+            aboutme.socket.on('message', aboutme.chat.receive);
+            aboutme.socket.on('photo', aboutme.chat.photo);
         });
     },
     chat: {
@@ -249,13 +246,12 @@ aboutme = {
             var msg = box.val();
             if (msg){
                 var send = {user: aboutme.user, message: msg};
-                console.log(JSON.stringify(send));
                 console.log(send.user.name + ': ' + send.message);
                 aboutme.socket.emit('chat', send);
                 box.val('');
             }
         },
-        receive: function (data){
+        receive: function(data){
             console.log('message: ' + data);
             if (!data) return;
             var obj = JSON.parse(data);
@@ -269,11 +265,11 @@ aboutme = {
             );
             aboutme.chat.reload();
         },
-        online: function (data){
+        online: function(data){
             console.log('online: ' + data);
             if (!data) return;
-             var obj = JSON.parse(data);
-             if (!obj.user || !obj.time || !obj.user) return;
+            var obj = JSON.parse(data);
+            if (!obj.time || !obj.user) return;
             aboutme.chat.history.push(
                 '<tr>' +
                     '<td class="col_1">[' + obj.time + ']</td>' +
@@ -282,7 +278,7 @@ aboutme = {
             );
             aboutme.chat.reload();
         },
-        reload: function (){
+        reload: function(){
             console.log('chat.history.length: ' + aboutme.chat.history.length);
             if (aboutme.chat.history.length >  aboutme.maxChatHistory)
                 aboutme.chat.history = aboutme.chat.history.slice(1, aboutme.maxChatHistory + 1);
@@ -293,6 +289,26 @@ aboutme = {
             aboutme.chat.history.forEach(function(o, i){
                 tbl.append(o);
             });
+        },
+        photo: function(data, emit){
+            if (emit){
+                var send = {user: aboutme.user, photo: data};
+                console.log(send.user.name + ': ' + send.photo);
+                aboutme.socket.emit('photo', send);
+            } else {
+                console.log('photo: ' + data);
+                if (!data) return;
+                var obj = JSON.parse(data);
+                if (!obj.time || !obj.user) return;
+                aboutme.chat.history.push(
+                    '<tr>' +
+                        '<td class="col_1">[' + obj.time + ']</td>' +
+                        '<td class="col_4" colspan="2">' + obj.user + ' changed the featured photo</td>' +
+                    '</tr>'
+                );
+                aboutme.chat.reload();
+                aboutme.photo.featured(obj.photo);
+            }
         }
     },
     login: function(uid){
@@ -567,7 +583,10 @@ aboutme = {
             });
         },
         click: function(i){
-            console.log('[click] i: ' + i);
+//          console.log('[click] i: ' + i);
+            aboutme.chat.photo(i, true);
+        },
+        featured: function(i){
             var featured = aboutme.photo.list[0];
             aboutme.photo.list[0] = aboutme.photo.list[i];
             aboutme.photo.list[i] = featured;
