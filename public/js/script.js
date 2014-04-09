@@ -290,7 +290,7 @@ aboutme = {
             tbl.empty();
 //          for (var i = aboutme.chat.history.length - 1; i > -1; i--)
 //              tbl.append(aboutme.chat.history[i]);
-            aboutme.chat.history.forEach(function (o, i){
+            aboutme.chat.history.forEach(function(o, i){
                 tbl.append(o);
             });
         }
@@ -460,7 +460,7 @@ aboutme = {
             if (i == aboutme.photo.selectedIndex) p += '&size=1';
             return  '<a id="image_' + i + '" href="' + d + '">' +
                         '<img src="' + p + '" class="photo" id="img_' + i + '" ' +
-                        'onmouseout="util.resize(this, 0, ' + i + ');" onmouseover="util.resize(this, 1, ' + i + ');">' +
+                            'onmouseover="aboutme.photo.resize(' + i + ');">' +
                     '</a>';
         },
         getPhotoCell: function(o, i){
@@ -547,9 +547,7 @@ aboutme = {
             });
 
             // adjust size
-            $('img.photo').each(function(i, o){
-                util.resize(o, 0, i);
-            });
+            aboutme.photo.resize(-1);
 
             maps.forEach(function(o){
                 aboutme.photo.initFancyBox('map', o, 'iframe');
@@ -560,6 +558,11 @@ aboutme = {
             $('div.blackbg_' + i).css('visibility', s);
             $('div.datetime_' + i).css('visibility', s);
             $('div.geo_' + i).css('visibility', s);
+        },
+        resize: function(i){
+            $('img.photo').each(function(idx, img){
+                util.resize(img, idx == i? 1: 0, idx);
+            });
         }
     },
     string: {
@@ -584,7 +587,9 @@ util = {
         }
         img.css('height', 'auto');
         img.css('width', w + 'px');
+        // find the for the corresponding label and set right of it
         $('div.' + img.attr('id').replace('img_', 'blackbg_')).css('right', r + 'px');
+        // show or hide label
         aboutme.photo.showLabel(i, type);
     },
     loadScript: function(url, callback){
