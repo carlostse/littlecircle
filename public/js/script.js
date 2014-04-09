@@ -521,7 +521,7 @@ aboutme = {
                 
                 // change row
                 if (col % aboutme.photo.numOfPhotoInRow(row) == 0){
-                    console.log('[reload] change row at (' + row + ', ' + col + '), index: ' + i);
+//                  console.log('[reload] change row at (' + row + ', ' + col + '), index: ' + i);
                     html += '</tr><tr>';
                     row++;
                     col = 0;
@@ -535,7 +535,7 @@ aboutme = {
                 aboutme.photo.num++;
             });
 
-            var div = $('div.showcase_container');
+            var div = $('div.photo_container');
             div.empty();
             div.append(html);
 
@@ -564,12 +564,18 @@ util = {
         return typeof val == 'string'? val.trim().length < 1: val.length < 1;
     },
     resize: function(x, type, i){
+//      console.log('[resize] type: ' + type + ', i: ' + i);
         var img = $(x)
-          , w = type == 1? aboutme.photo.originalWidth * 1.05: type == 2? aboutme.photo.originalWidth * 2: aboutme.photo.originalWidth;
-        if (i == aboutme.photo.selectedIndex) w *= 2;
+          , w = type == 1? aboutme.photo.originalWidth * 1.05: aboutme.photo.originalWidth
+          , r = type == 1? 10: 20;
+        if (i == aboutme.photo.selectedIndex) {
+            w *= 2;
+            r *= 2.2;
+            if (type == 1) r += 2;
+        }
         img.css('height', "auto");
         img.css('width', w + 'px');
-        $('div.' + img.attr('id').replace('img_', 'blackbg_')).css('right', (type == 1? 10: 20) + 'px');
+        $('div.' + img.attr('id').replace('img_', 'blackbg_')).css('right', r + 'px');
     },
     loadScript: function(url, callback){
         console.log('[loadScript] ' + url);

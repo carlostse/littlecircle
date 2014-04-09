@@ -70,8 +70,8 @@ div.photo {
     position: relative;
     width: 100%;
     height: auto;
-    float: left;
-    margin-left: 2%;
+    margin-left:auto;
+    margin-right:auto;
     margin-bottom: 2%;
     overflow: hidden;
     top:10px;
@@ -106,10 +106,16 @@ div.photo div.geo a {
    color: white;
 }
 img.photo {
-    width: 200px;
+    width: 200px; /* expandable to 210px */
     cursor:pointer;
     box-shadow: 12px 12px 12px rgba(0, 0, 0, 0.5);
     height: auto;
+}
+div.photo_container table tr {
+    height: 170px;
+}
+div.photo_container table td {
+    width: 220px;
 }
 .file_upload {
     width: 80%;
@@ -122,8 +128,6 @@ img.photo {
     border-radius: 3px;
     font-family:Arial,Helvetica,sans-serif;
     background: -webkit-gradient(linear, left top, right bottom, from(#4D7E8D), to(#E1855C));
-
-
 }
 div.create_event_box {
     display:none;
@@ -206,7 +210,7 @@ button.upload {
     font-weight: normal;
     border: 1px solid white;
     font-family:Arial,Helvetica,sans-serif;
-    border-radius: 3px;    
+    border-radius: 3px;
 }
 /* do not group these rules */
 *::-webkit-input-placeholder {
