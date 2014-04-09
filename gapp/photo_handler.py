@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import os
 import urllib
 import webapp2
 import json
 import logging
+import datetime
 import core_util
 from google.appengine.ext import ndb
 from google.appengine.ext import blobstore
@@ -56,15 +58,21 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         preview = img.execute_transforms(output_encoding=images.JPEG, quality=LITTLECIRCLE_IMG_Q, parse_source_metadata=True)
 
         # try to get geo location and date time of the photo
+        env = os.environ['SERVER_SOFTWARE']
+        dev = (core_util.is_missing(env) == False) and (env.split('/')[0] == 'Development')
         meta = img.get_original_metadata()
-        logging.debug("[UploadHandler] meta: {}".format(meta))
+        logging.debug("[UploadHandler] env: {}, dev: {}, meta: {}".format(env, dev, meta))
 
         dt = None
-        if ('DateTime' in meta):
+        if (dev == True):
+            dt = datetime.datetime.now()
+        elif ('DateTime' in meta):
             dt = core_util.exif_datetime_to_datetime(meta['DateTime'])
 
         loc = None
-        if ('GPSLatitude' in meta and 'GPSLongitude' in meta):
+        if (dev == True):
+            loc = ndb.GeoPt(22.4182277, 114.2080536)
+        elif ('GPSLatitude' in meta and 'GPSLongitude' in meta):
             loc = ndb.GeoPt(meta['GPSLatitude'], meta['GPSLongitude'])
 
         logging.info("[UploadHandler] photo taken at {} in location {}".format(dt, loc))

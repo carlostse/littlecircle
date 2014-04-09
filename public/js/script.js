@@ -447,9 +447,9 @@ aboutme = {
     },
     photo: {
         num: 0,
-        selectedIndex: 0,
-        firstAffected: 1, 
-        secondAffected: 2,
+        selectedIndex: -1,
+        firstAffected: -1,
+        secondAffected: -1,
         numOfPhotoPerRow: 4,
         originalWidth: 200,
         list: [],
@@ -469,7 +469,7 @@ aboutme = {
                             aboutme.photo.getPhotoLink(o.pkey, i) +
                             '<div class="blackbg blackbg_' + i + '">&nbsp;</div>' +
                             '<div class="datetime datetime_' + i + '">' + o.datetime + '</div>' +
-                            (o.geo? '<div class="geo"><a id="map_' + i + '" href="/app/map/' + o.geo + '">show map</a></div>': '') +
+                            (o.geo? '<div class="geo geo_' + i + '"><a id="map_' + i + '" href="/app/map/' + o.geo + '">show map</a></div>': '') +
                         '</div>' +
                     '</td>';
         },
@@ -501,24 +501,26 @@ aboutme = {
             });
         },
         numOfPhotoInRow: function(row){
-            return row == aboutme.photo.firstAffected? aboutme.photo.numOfPhotoPerRow - 1: 
+            return row == aboutme.photo.firstAffected? aboutme.photo.numOfPhotoPerRow - 1:
                    row == aboutme.photo.secondAffected? aboutme.photo.numOfPhotoPerRow - 2: aboutme.photo.numOfPhotoPerRow;
         },
         reload: function(){
-            var html = '' // cannot append to div directly due to threading problem
+            var html = '<table><tr>' // cannot append to div directly due to threading problem
               , maps = []
-              , idx = aboutme.photo.list.length - 1;
+              , idx = aboutme.photo.list.length - 1
+              , large = aboutme.photo.list.length > 5; // only show large photo if number of photo > 5
+
+            aboutme.photo.selectedIndex = large? 0: -1;
+            aboutme.photo.firstAffected = large? 1: -1;
+            aboutme.photo.secondAffected = large? 2: -1;
 
             // display photo
             var row = 1, col = 1;
             aboutme.photo.list.forEach(function(o, i){
-                // header
-                if (i == 0) html += '<table><tr>';
-
                 // content
                 if (o.geo) maps.push(i);
                 html += aboutme.photo.getPhotoCell(o, i);
-                
+
                 // change row
                 if (col % aboutme.photo.numOfPhotoInRow(row) == 0){
 //                  console.log('[reload] change row at (' + row + ', ' + col + '), index: ' + i);
@@ -527,13 +529,13 @@ aboutme = {
                     col = 0;
                 }
                 col++;
-                
-                // footer
-                if (i == idx) html += '</tr></table>';
 
                 // count
                 aboutme.photo.num++;
             });
+
+            // footer
+            html += '</tr></table>';
 
             var div = $('div.photo_container');
             div.empty();
@@ -556,7 +558,8 @@ aboutme = {
         showLabel: function(i, show){
             var s = show? 'visible': 'hidden';
             $('div.blackbg_' + i).css('visibility', s);
-            $('div.datetime_' + i).css('visibility', s); 
+            $('div.datetime_' + i).css('visibility', s);
+            $('div.geo_' + i).css('visibility', s);
         }
     },
     string: {
