@@ -290,6 +290,7 @@ div.gallery_head {
     font-family: 'Allura', cursive;
     font-style: normal;
     font-weight: 400;
+    z-index:2;
 }
 .button_upload {
     width: 100px;
@@ -383,4 +384,91 @@ img.icon {
     top: 40px;
     width: 90px;
 }
+#matrix_1_1{
+    width:200px;
+    height:100px;
+    position: absolute;
+    display: block;
+    padding-top:10px;
+    padding-left:10px;
+    padding-bottom:10px;
+    padding-right:10px;
+    z-index:2;
+    top:50px;
+}
+.button_map{
+    position:absolute;
+    display: block;
+    z-index:1;
+    cursor:pointer;
+    width: 100px;
+    background: -webkit-gradient(linear, left top, left bottom, from(#2B84B3), to(#3B5898));
+    height: 22px;
+    font-size: 16px;
+    font-weight: normal;
+    border: 1px solid white;
+    color: white;
+    cursor: pointer;
+    border-radius: 3px;
+    font-family:Arial,Helvetica,sans-serif;
+    background: transparent;
+    left:63px;
+    top:40px;
+}
+.button_gpview{
+    position:absolute;
+    display: block;
+    z-index:1;
+    cursor:pointer;
+    width: 100px;
+    background: -webkit-gradient(linear, left top, left bottom, from(#2B84B3), to(#3B5898));
+    height: 22px;
+    font-size: 16px;
+    font-weight: normal;
+    border: 1px solid white;
+    color: white;
+    cursor: pointer;
+    border-radius: 3px;
+    font-family:Arial,Helvetica,sans-serif;
+    background: transparent;
+    left:63px;
+    top:70px;
+}
+#imgSmile{
+    width:200px;
+    position:absolute;
+    z-index:2;
+}
+#today{
+    position:absolute;
+    display: inline;
+    z-index:1;
+    height: 22px;
+    font-size: 16px;
+    font-weight: normal;
+    color: white;
+    font-family:Arial,Helvetica,sans-serif;
+    background: transparent;
+    left:20px;
+    top:100px;
+    width:100px;
+    z-index:1;
+}
+#enlarge{
+    position:absolute;
+    display: inline;
+    z-index:1;
+    cursor: pointer;
+    left:15px;
+    top:15px;
+}
+#delete{
+    position:absolute;
+    display: inline;
+    z-index:1;
+    cursor: pointer;
+    right:15px;
+    bottom:5px;
+}
+
 /* end - alert dialog */

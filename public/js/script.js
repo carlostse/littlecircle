@@ -651,3 +651,35 @@ function alert(messages){
     $($('img.icon').get(1)).css('display', success? 'inline': 'none');
     $('div.base').css('display', msg? 'inline': 'none');
 }
+$(document).ready(function(){
+       $(".button_map").animate({opacity: 0},"slow");
+       $("#imgSmile").fadeTo("slow",1);
+       $("#imgSmile").css("z-index","2");
+       $("#today").fadeTo("slow",0);
+       $("#enlarge").fadeTo("slow",0);
+       $(".button_gpview").animate({opacity: 0},"slow");
+       $("#delete").fadeTo("slow",0);
+       
+       $('#matrix_1_1').mouseenter(function()
+       {
+          $(".button_map").animate({opacity: 1},"slow");
+          $(".button_gpview").animate({opacity: 1},"slow");
+          $("#imgSmile").fadeTo("slow",0.4);
+          $("#imgSmile").css("z-index","0");
+          $("#today").fadeTo("slow",1);
+          $("#enlarge").fadeTo("slow",1);
+          $("#delete").fadeTo("slow",1);
+       });
+       $('#matrix_1_1').mouseleave(function()
+       {   
+          $(".button_map").animate({opacity: 0},"slow");
+          $(".button_gpview").animate({opacity: 0},"slow");
+          $("#imgSmile").fadeTo("slow",1);
+          $("#imgSmile").css("z-index","2");
+          $("#today").fadeTo("slow",0);
+          $("#enlarge").fadeTo("slow",0);
+          $("#delete").fadeTo("slow",0);
+       });
+   });
+
+ 
