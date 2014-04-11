@@ -2,7 +2,7 @@
 <html>
 <head>
 <link href='http://fonts.googleapis.com/css?family=Allura|Ubuntu+Condensed' rel='stylesheet' type='text/css'>
-<title><%= title %></title>
+<title>Little Circle</title>
 <link rel="icon" href="favicon.ico" type="image/x-icon">
 <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Duru+Sans">
 <link rel="stylesheet" type="text/css" href="/css/fancybox/jquery.fancybox-1.3.4.css">
@@ -14,13 +14,13 @@
 </head>
 <body>
 <div class="chatbase">
-    <div class="fb-login-button"
-		data-scope="email, user_birthday, user_friends, publish_actions"
+	<!-- user_friends, publish_actions -->
+	<div class="fb-login-button"
+		data-scope="email, user_birthday"
 		data-max-rows="1" data-size="large"
 		data-show-faces="true" data-auto-logout-link="false"></div>
 	<br><br>
 	<button id="logout_button" onclick="aboutme.logout();">Logout</button>
-	<div class="event"></div>
 	<br>
 	<a href="#create_event" class="create_event"><button class="upload">Upload</button></a>
 	<br><br>
@@ -31,36 +31,19 @@
 		<h1 class="chat_title">Circle Chat</h1>
 	</div>
 	<div>
-		
 		<textarea placeholder="Chat here..." class="chat_message" onkeydown="aboutme.chat.keydown(this, event);"></textarea>
 		<br><br>
 		<button class="button_send" onclick="aboutme.chat.send();">Send</button>
 	</div>
 </div>
 
+<!-- gallery -->
 <div class="gallery_head" >
 	<h2 class="gallery_title">Little Gallery</h2>
 </div>
+<div class="gallery"></div>
 
-<div class="gallerybase">
-	<!-- <div class="photo_container">-->
-    
-        <div id="matrix_1_1">
-            <img src="/img/enlarge01.png" alt="" id="enlarge" width="42" height="42"></img>
-            <img src="/img/delete01.png" alt="" id="delete" width="21" height="25"></img>
-            <img src="/img/a2.jpg" alt="" id="imgSmile"></img>
-            <button class="button_map" >Map</button>
-            <button class="button_gpview" >GroupView</button>
-            <div id="today" >9 Apri 2014</div>
-        </div>
-        
-        
-        
-		<!-- <img class="banner" onmouseover="util.bigImg(this)" onmouseout="util.normalImg(this)" src="img/banner_w.png" > -->
-	<!--</div>-->
-</div>
-
-<!-- create event -->
+<!-- upload -->
 <div class="create_event_box">
 	<div id="create_event" class="create_event">
 		<form enctype="multipart/form-data" class="form_upload">

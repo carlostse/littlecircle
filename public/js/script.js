@@ -10,8 +10,8 @@ facebook = {
                     // the user's ID, a valid access token, a signed
                     // request, and the time the access token
                     // and signed request each expire
-                    var uid = response.authResponse.userID;
-                    var accessToken = response.authResponse.accessToken;
+                    var uid = response.authResponse.userID
+                      , accessToken = response.authResponse.accessToken;
                     console.log('[getLoginStatus] connected, user: ' + uid);
                     console.log('[getLoginStatus] connected, token: ' + accessToken);
                     console.log('[getLoginStatus] redirect to main page');
@@ -473,21 +473,30 @@ aboutme = {
             var p = aboutme.path.photo_view + '?sid=' + aboutme.user.sid + '&id=' + id;
             if (i == aboutme.photo.selectedIndex) p += '&size=1';
             return [p + '&size=2',
-                    '<img src="' + p + '" class="photo" id="img_' + i + '" ' +
-                        'onclick="aboutme.photo.click(' + i + ');" ' +
-                        'onmouseover="aboutme.photo.resize(' + i + ');">'];
+                    '<img src="' + p + '" alt="photo" class="photo" id="img_' + i + '" ' +
+//                      'onclick="aboutme.photo.click(' + i + ');" ' +
+//                      'onmouseover="aboutme.photo.resize(' + i + ');"' +
+                    '>'];
         },
         getPhotoCell: function(o, i){
             var links = aboutme.photo.getPhotoLink(o.pkey, i);
             return  '<td ' + (i == aboutme.photo.selectedIndex? 'colspan="2" rowspan="2"': '') + '>' +
-                        '<div class="photo">' +
+                        '<div class="photo photo_' + i + '">' +
+                            /*
                             links[1] +
                             '<div class="blackbg blackbg_' + i + '">&nbsp;</div>' +
-                            '<div class="datetime datetime_' + i + '">' + o.datetime + '</div>' +
+                            '<div class="date date_' + i + '">' + o.datetime + '</div>' +
                             '<div class="geo geo_' + i + '">' +
                                 '<a id="image_' + i + '" href="' + links[0] + '">full size</a>' +
                                 (o.geo? ' / <a id="map_' + i + '" href="/app/map/' + o.geo + '">show map</a>': '') +
                             '</div>' +
+                            */
+                            '<a id="image_' + i + '" href="' + links[0] + '"><img src="/img/enlarge01.png" alt="enlarge" class="enlarge enlarge_' + i + '"></a>' +
+                            '<img src="/img/delete01.png" alt="delete" class="delete delete_' + i + '">' +
+                            links[1] +
+                            (o.geo? '<a id="showmap_' + i + '" href="/app/map/' + o.geo + '"><button class="map map_' + i + '">Map</button></a>': '') +
+                            '<button class="group group_' + i + '" onclick="aboutme.photo.click(' + i + ');">Group View</button>' +
+                            '<div class="date date_' + i + '">' + o.datetime + '</div>' +
                         '</div>' +
                     '</td>';
         },
@@ -516,6 +525,34 @@ aboutme = {
                 'type'          : type? type: tag,
                 'transitionIn'  : 'elastic',
                 'transitionOut' : 'elastic'
+            });
+        },
+        initEffect: function(i){
+            console.log('initEffect: ' + i);
+            $('button.map_' + i).animate({opacity: 0}, "slow");
+            $('button.group_' + i).animate({opacity: 0}, "slow");
+            $('#img_' + i).fadeTo("slow", 1);
+            $('#img_' + i).css("z-index", "2");
+            $('div.date_' + i).fadeTo("slow", 0);
+            $('img.enlarge_' + i).fadeTo("slow", 0);
+            $('img.delete_' + i).fadeTo("slow", 0);
+            $('div.photo_' + i).mouseenter(function(){
+                $('button.map_' + i).animate({opacity: 1}, "slow");
+                $('button.group_' + i).animate({opacity: 1}, "slow");
+                $('#img_' + i).fadeTo("slow", 0.4);
+                $('#img_' + i).css("z-index", "0");
+                $('div.date_' + i).fadeTo("slow", 1);
+                $('img.enlarge_' + i).fadeTo("slow", 1);
+                $('img.delete_' + i).fadeTo("slow", 1);
+            });
+            $('div.photo_' + i).mouseleave(function(){
+                $('button.map_' + i).animate({opacity: 0}, "slow");
+                $('button.group_' + i).animate({opacity: 0}, "slow");
+                $('#img_' + i).fadeTo("slow", 1);
+                $('#img_' + i).css("z-index", "2");
+                $('div.date_' + i).fadeTo("slow", 0);
+                $('img.enlarge_' + i).fadeTo("slow", 0);
+                $('img.delete_' + i).fadeTo("slow", 0);
             });
         },
         numOfPhotoInRow: function(row){
@@ -555,28 +592,31 @@ aboutme = {
             // footer
             html += '</tr></table>';
 
-            var div = $('div.photo_container');
+            var div = $('div.gallery');
             div.empty();
             div.append(html);
 
-            // init fancy box
+            // init effects
             aboutme.photo.list.forEach(function(o, i){
                 aboutme.photo.initFancyBox('image', i);
+                aboutme.photo.initEffect(i);
             });
 
             // adjust size
             aboutme.photo.resize(-1);
 
             maps.forEach(function(o){
-                aboutme.photo.initFancyBox('map', o, 'iframe');
+                aboutme.photo.initFancyBox('showmap', o, 'iframe');
             });
         },
+        /*
         showLabel: function(i, show){
             var s = show? 'visible': 'hidden';
             $('div.blackbg_' + i).css('visibility', s);
-            $('div.datetime_' + i).css('visibility', s);
+            $('div.date_' + i).css('visibility', s);
             $('div.geo_' + i).css('visibility', s);
         },
+        */
         resize: function(i){
             $('img.photo').each(function(idx, img){
                 util.resize(img, idx == i? 1: 0, idx);
@@ -616,9 +656,9 @@ util = {
         img.css('height', 'auto');
         img.css('width', w + 'px');
         // find the for the corresponding label and set right of it
-        $('div.' + img.attr('id').replace('img_', 'blackbg_')).css('right', r + 'px');
+        // $('div.' + img.attr('id').replace('img_', 'blackbg_')).css('right', r + 'px');
         // show or hide label
-        aboutme.photo.showLabel(i, type);
+        // aboutme.photo.showLabel(i, type);
     },
     loadScript: function(url, callback){
         console.log('[loadScript] ' + url);
@@ -651,35 +691,3 @@ function alert(messages){
     $($('img.icon').get(1)).css('display', success? 'inline': 'none');
     $('div.base').css('display', msg? 'inline': 'none');
 }
-$(document).ready(function(){
-       $(".button_map").animate({opacity: 0},"slow");
-       $("#imgSmile").fadeTo("slow",1);
-       $("#imgSmile").css("z-index","2");
-       $("#today").fadeTo("slow",0);
-       $("#enlarge").fadeTo("slow",0);
-       $(".button_gpview").animate({opacity: 0},"slow");
-       $("#delete").fadeTo("slow",0);
-       
-       $('#matrix_1_1').mouseenter(function()
-       {
-          $(".button_map").animate({opacity: 1},"slow");
-          $(".button_gpview").animate({opacity: 1},"slow");
-          $("#imgSmile").fadeTo("slow",0.4);
-          $("#imgSmile").css("z-index","0");
-          $("#today").fadeTo("slow",1);
-          $("#enlarge").fadeTo("slow",1);
-          $("#delete").fadeTo("slow",1);
-       });
-       $('#matrix_1_1').mouseleave(function()
-       {   
-          $(".button_map").animate({opacity: 0},"slow");
-          $(".button_gpview").animate({opacity: 0},"slow");
-          $("#imgSmile").fadeTo("slow",1);
-          $("#imgSmile").css("z-index","2");
-          $("#today").fadeTo("slow",0);
-          $("#enlarge").fadeTo("slow",0);
-          $("#delete").fadeTo("slow",0);
-       });
-   });
-
- 

@@ -51,8 +51,7 @@ h2 {
     padding-bottom:10px;
     padding-right:10px;
 }
-.gallerybase {
-    /*background-color: #2B84B3;*/
+div.gallery {
     position: absolute;
     height: auto;
     left: 2%;
@@ -66,6 +65,100 @@ h2 {
     padding-bottom:10px;
     padding-right:10px;
 }
+div.gallery table tr {
+    height: 170px;
+}
+div.gallery table td {
+    width: 220px;
+}
+div.photo {
+    width: 200px;
+    height: 100px;
+    position: absolute;
+    display: block;
+    padding: 10px;
+    z-index: 2;
+    top: 50px;
+}
+div.photo img.enlarge {
+    width: 42px;
+    height: 42px;
+    position: absolute;
+    display: inline;
+    z-index: 1;
+    cursor: pointer;
+    left: 15px;
+    top: 15px;
+}
+div.photo img.delete {
+    width: 21px;
+    height: 25px;
+    position: absolute;
+    display: inline;
+    z-index: 1;
+    cursor: pointer;
+    right: 15px;
+    bottom: 5px;
+}
+div.photo img.photo {
+    width: 200px;
+    position: absolute;
+    z-index:2;
+}
+div.photo button.map{
+    position:absolute;
+    display: block;
+    z-index:1;
+    cursor:pointer;
+    width: 100px;
+    background: -webkit-gradient(linear, left top, left bottom, from(#2B84B3), to(#3B5898));
+    height: 22px;
+    font-size: 16px;
+    font-weight: normal;
+    border: 1px solid white;
+    color: white;
+    cursor: pointer;
+    border-radius: 3px;
+    font-family:Arial,Helvetica,sans-serif;
+    background: transparent;
+    left:63px;
+    top:40px;
+}
+div.photo button.group{
+    position:absolute;
+    display: block;
+    z-index:1;
+    cursor:pointer;
+    width: 100px;
+    background: -webkit-gradient(linear, left top, left bottom, from(#2B84B3), to(#3B5898));
+    height: 22px;
+    font-size: 16px;
+    font-weight: normal;
+    border: 1px solid white;
+    color: white;
+    cursor: pointer;
+    border-radius: 3px;
+    font-family:Arial,Helvetica,sans-serif;
+    background: transparent;
+    left:63px;
+    top:70px;
+}
+div.photo div.date {
+    position:absolute;
+    display: inline;
+    z-index:1;
+    height: 22px;
+    font-size: 16px;
+    font-weight: normal;
+    color: white;
+    font-family:Arial,Helvetica,sans-serif;
+    background: transparent;
+    left:20px;
+    top:100px;
+    width:100px;
+    z-index:1;
+}
+/*
 div.photo {
     position: relative;
     width: 100%;
@@ -92,7 +185,7 @@ div.photo div.blackbg {
     filter: alpha(opacity=50);
     opacity: 0.5;
 }
-div.photo div.datetime {
+div.photo div.date {
     z-index: 3;
     color: #FFFFFF;
     font-family: 'Ubuntu Condensed', cursive;
@@ -110,17 +203,12 @@ div.photo div.geo a {
    color: #FFFFFF;
 }
 img.photo {
-    width: 200px; /* expandable to 210px */
+    width: 200px;
     cursor:pointer;
     box-shadow: 12px 12px 12px rgba(0, 0, 0, 0.5);
     height: auto;
 }
-div.photo_container table tr {
-    height: 170px;
-}
-div.photo_container table td {
-    width: 220px;
-}
+*/
 .file_upload {
     width: 80%;
     height: 25px;
@@ -161,10 +249,10 @@ button.upload {
     background: transparent;
 }
 .title {
-    width:95%;
+    width: 95%;
 }
 .location {
-    width:80%;
+    width: 80%;
 }
 .button_Post_Status {
     width: 100px;
@@ -384,91 +472,4 @@ img.icon {
     top: 40px;
     width: 90px;
 }
-#matrix_1_1{
-    width:200px;
-    height:100px;
-    position: absolute;
-    display: block;
-    padding-top:10px;
-    padding-left:10px;
-    padding-bottom:10px;
-    padding-right:10px;
-    z-index:2;
-    top:50px;
-}
-.button_map{
-    position:absolute;
-    display: block;
-    z-index:1;
-    cursor:pointer;
-    width: 100px;
-    background: -webkit-gradient(linear, left top, left bottom, from(#2B84B3), to(#3B5898));
-    height: 22px;
-    font-size: 16px;
-    font-weight: normal;
-    border: 1px solid white;
-    color: white;
-    cursor: pointer;
-    border-radius: 3px;
-    font-family:Arial,Helvetica,sans-serif;
-    background: transparent;
-    left:63px;
-    top:40px;
-}
-.button_gpview{
-    position:absolute;
-    display: block;
-    z-index:1;
-    cursor:pointer;
-    width: 100px;
-    background: -webkit-gradient(linear, left top, left bottom, from(#2B84B3), to(#3B5898));
-    height: 22px;
-    font-size: 16px;
-    font-weight: normal;
-    border: 1px solid white;
-    color: white;
-    cursor: pointer;
-    border-radius: 3px;
-    font-family:Arial,Helvetica,sans-serif;
-    background: transparent;
-    left:63px;
-    top:70px;
-}
-#imgSmile{
-    width:200px;
-    position:absolute;
-    z-index:2;
-}
-#today{
-    position:absolute;
-    display: inline;
-    z-index:1;
-    height: 22px;
-    font-size: 16px;
-    font-weight: normal;
-    color: white;
-    font-family:Arial,Helvetica,sans-serif;
-    background: transparent;
-    left:20px;
-    top:100px;
-    width:100px;
-    z-index:1;
-}
-#enlarge{
-    position:absolute;
-    display: inline;
-    z-index:1;
-    cursor: pointer;
-    left:15px;
-    top:15px;
-}
-#delete{
-    position:absolute;
-    display: inline;
-    z-index:1;
-    cursor: pointer;
-    right:15px;
-    bottom:5px;
-}
-
 /* end - alert dialog */
