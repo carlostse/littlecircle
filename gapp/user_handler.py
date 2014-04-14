@@ -53,11 +53,17 @@ class UserLoginHandler(webapp2.RequestHandler):
                 logging.error("[UserLoginHandler] cannot find user: {}", userId)
             else:
                 # logout previous session ID(s)
-                keys = littlecircle.Login.query(littlecircle.Login.user == userKey)
-                list = keys.fetch()
-                for obj in list:
-                    obj.status = False
-                ndb.put_multi(keys)
+
+                '''
+                due to the quota limitation in free GAE,
+                here we delete instead of set inactive (reduced security)
+                '''
+#               keys = littlecircle.Login.query(littlecircle.Login.user==userKey)
+#               list = keys.fetch()
+#               for obj in list:
+#                   obj.status = False
+#               ndb.put_multi(keys)
+                ndb.delete_multi(littlecircle.Login.query(littlecircle.Login.user==userKey).fetch(keys_only=True))
 
                 # create login record and return session ID
                 k = littlecircle.Login(
