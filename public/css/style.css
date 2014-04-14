@@ -74,7 +74,7 @@ div.gallery table td {
 div.photo {
     width: 200px;
     height: 100px;
-    position: absolute;
+    position: relative;
     display: block;
     padding: 10px;
     z-index: 2;
@@ -471,5 +471,8 @@ img.icon {
     left: 10px;
     top: 40px;
     width: 90px;
+}
+tbody{
+    vertical-align: top;
 }
 /* end - alert dialog */
