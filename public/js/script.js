@@ -97,9 +97,11 @@ aboutme = {
         user_logout_url: '/gapp/user_logout',
         upload_url: '/gapp/upload_url',
         photo_search: '/gapp/search',
-        photo_view: '/gapp/view'
+        photo_view: '/gapp/view',
+        photo_delete: '/gapp/delete'
     },
     maxChatHistory: 10,
+    maxPhotoSize: 10, // MB
     socketPort: 3000,
     socket: null,
     user: {
@@ -220,6 +222,11 @@ aboutme = {
             'hideOnOverlayClick': false
         });
 
+        // file change listener
+        $(':file').change(function(){
+            aboutme.upload.file = this.files[0];
+        });
+
         // prepare upload photo
         aboutme.upload.prepare();
 
@@ -328,7 +335,7 @@ aboutme = {
             // login to little circle to get session ID
             aboutme.userLogin(function(){
                 // load photo after login
-                aboutme.photo.search({sid: aboutme.user.sid});
+                aboutme.photo.search();
             });
         });
 //      console.log('loading friends');
@@ -361,6 +368,7 @@ aboutme = {
     },
     upload: {
         url: '',
+        file: null,
         prepare: function(){
             $.ajax({
                 type: "GET",
@@ -372,23 +380,43 @@ aboutme = {
                 }
                 aboutme.upload.url = data;
                 $('a.create_event').css('visibility', 'visible');
+
+
             });
         },
         validate: function(){
-            /*
-            $(':file').change(function(){
-                var file = this.files[0];
-                var name = file.name;
-                var size = file.size;
-                var type = file.type;
-                alert(name);
-            });
-            */
+            var file = aboutme.upload.file;
+            if (!file)
+                return 'Please select a photo to upload';
+
+            var name = file.name
+              , size = file.size / 1024 / 1024
+              , mine = file.type
+              , type = mine? mine.split('/')[0]: '';
+            console.log('[validate] file: ' + name + ' (' + mine + ', ' + type + ') [' + size + ']');
+
+            if (size > aboutme.maxPhotoSize)
+                return 'The photo size exceed the limit, please select a photo smaller than ' + aboutme.maxPhotoSize + 'MB';
+
+            if (!type || type.toLowerCase() != 'image')
+                return 'Please select a photo to upload';
+
+            // every thing okay
+            return null;
         },
         action: function(){
 //          if (!confirm(aboutme.string.confirm_upload)){
 //              return;
 //          }
+
+            // validate the file
+            var err = aboutme.upload.validate();
+            console.log('[action] err: ' + err);
+            if (!util.isMissing(err)){
+                $.fancybox.close();
+                alert([err]);
+                return;
+            }
 
             // prepare form data
             var formData = new FormData($('form.form_upload')[0]);
@@ -492,7 +520,7 @@ aboutme = {
                             '</div>' +
                             */
                             '<a id="image_' + i + '" href="' + links[0] + '"><img src="/img/enlarge01.png" alt="enlarge" class="enlarge enlarge_' + i + '"></a>' +
-                            '<img src="/img/delete01.png" alt="delete" class="delete delete_' + i + '">' +
+                            '<img src="/img/delete01.png" alt="delete" class="delete delete_' + i + '" onclick="aboutme.photo.remove(' + i + ')">' +
                             links[1] +
                             (o.geo? '<a id="showmap_' + i + '" href="/app/map/' + o.geo + '"><button class="map map_' + i + '">Map</button></a>': '') +
                             '<button class="group group_' + i + '" onclick="aboutme.photo.click(' + i + ');">Group View</button>' +
@@ -500,13 +528,13 @@ aboutme = {
                         '</div>' +
                     '</td>';
         },
-        search: function(data){
-            if (!data.sid || data.sid < 1)
+        search: function(){
+            if (!aboutme.user.sid || aboutme.user.sid < 1)
                 return;
+
             $.ajax({
                 type: "GET",
-                url: aboutme.path.photo_search,
-                data: data
+                url: aboutme.path.photo_search + '/' + aboutme.user.sid
             }).done(function(data){
                 if (!data){
                     alert(['Your request cannot be processed, please try again later.<br>Ref. #' + 500]);
@@ -516,8 +544,8 @@ aboutme = {
                 aboutme.photo.reload();
 
             }).fail(function(data){
-                console.log(data);
-                alert(['Your request cannot be processed, please try again later.<br>Ref. #' + 500]);
+                console.log(JSON.stringify(data));
+                alert(['Your request cannot be processed, please try again later.<br>Ref. #' + (data.status? data.status: 500)]);
             });
         },
         initFancyBox: function(tag, index, type){
@@ -631,6 +659,25 @@ aboutme = {
             aboutme.photo.list[0] = aboutme.photo.list[i];
             aboutme.photo.list[i] = featured;
             aboutme.photo.reload();
+        },
+        remove: function(i){
+            var pkey = aboutme.photo.list[i].pkey;
+            console.log('[remove] photo: ' + pkey);
+            $.ajax({
+                type: "GET",
+                url: aboutme.path.photo_delete + '/' + aboutme.user.sid + '/' + pkey
+            }).done(function(data){
+                if (!data){
+                    alert(['Your request cannot be processed, please try again later.<br>Ref. #' + 500]);
+                    return;
+                }
+                aboutme.photo.list.splice(i, 1);
+                aboutme.photo.reload();
+
+            }).fail(function(data){
+                console.log(JSON.stringify(data));
+                alert(['Your request cannot be processed, please try again later.<br>Ref. #' + (data.status? data.status: 500)]);
+            });
         }
     },
     string: {

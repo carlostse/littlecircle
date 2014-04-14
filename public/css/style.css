@@ -103,13 +103,13 @@ div.photo img.delete {
 div.photo img.photo {
     width: 200px;
     position: absolute;
-    z-index:2;
+    z-index: 2;
 }
 div.photo button.map{
-    position:absolute;
+    position: absolute;
     display: block;
-    z-index:1;
-    cursor:pointer;
+    z-index: 1;
+    cursor: pointer;
     width: 100px;
     background: -webkit-gradient(linear, left top, left bottom, from(#2B84B3), to(#3B5898));
     height: 22px;
@@ -119,16 +119,16 @@ div.photo button.map{
     color: white;
     cursor: pointer;
     border-radius: 3px;
-    font-family:Arial,Helvetica,sans-serif;
+    font-family: Arial,Helvetica,sans-serif;
     background: transparent;
-    left:63px;
-    top:40px;
+    left: 63px;
+    top: 40px;
 }
 div.photo button.group{
     position:absolute;
     display: block;
-    z-index:1;
-    cursor:pointer;
+    z-index: 1;
+    cursor: pointer;
     width: 100px;
     background: -webkit-gradient(linear, left top, left bottom, from(#2B84B3), to(#3B5898));
     height: 22px;
@@ -138,25 +138,24 @@ div.photo button.group{
     color: white;
     cursor: pointer;
     border-radius: 3px;
-    font-family:Arial,Helvetica,sans-serif;
+    font-family: Arial,Helvetica,sans-serif;
     background: transparent;
-    left:63px;
-    top:70px;
+    left: 63px;
+    top: 70px;
 }
 div.photo div.date {
-    position:absolute;
+    position: absolute;
     display: inline;
-    z-index:1;
+    z-index: 1;
     height: 22px;
     font-size: 16px;
     font-weight: normal;
     color: white;
-    font-family:Arial,Helvetica,sans-serif;
+    font-family: Arial,Helvetica,sans-serif;
     background: transparent;
-    left:20px;
-    top:100px;
-    width:100px;
-    z-index:1;
+    left: 20px;
+    top: 100px;
+    width: 100px;
 }
 /*
 div.photo {
@@ -378,7 +377,7 @@ div.gallery_head {
     font-family: 'Allura', cursive;
     font-style: normal;
     font-weight: 400;
-    z-index:2;
+    z-index: 2;
 }
 .button_upload {
     width: 100px;
@@ -419,6 +418,7 @@ div.base {
     bottom: 0px;
     display: none;
     background:linear-gradient(to bottom, rgba(33, 65, 80, 0.2), rgba(17, 0, 48, 0.8));
+    z-index: 100;
 }
 div.dialog-box {
     position: relative;

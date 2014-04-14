@@ -10,7 +10,7 @@ class Resp:
     def __init__(self, status = 0):
         self.status = status
 
-    def toJson(self):
+    def to_json(self):
         return json.dumps({
             'status': self.status
         })

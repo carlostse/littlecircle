@@ -84,7 +84,7 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         # save photo information
         p = littlecircle.Photo(
             key=ndb.Key(littlecircle.Photo, str(blob_key)),
-            owner=login.user,
+            owner=user.key,
             #event=eventKey,
             size=size,
             geo=loc,
@@ -98,9 +98,13 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         self.response.out.write(json.dumps(p.to_dict()))
 
 class ImageSearchHandler(webapp2.RequestHandler):
-    def get(self):
-        #event = self.request.get('event')
-        #logging.info("[ImageSearchHandler] event: {}".format(event))
+    def get(self, url_sid):
+
+        # check user login
+        if (littlecircle.Login.is_valid_sid(str(urllib.unquote(url_sid))) == False):
+            logging.error("[ImageViewHandler] invalid session id")
+            self.error(401)
+            return
 
         list = littlecircle.Photo.query(
         littlecircle.Photo.deletedDate == None).order(
@@ -117,17 +121,20 @@ class ImageViewHandler(webapp2.RequestHandler):
     def get(self):
         self.response.headers['Content-Type'] = 'image/jpeg'
 
+        # get the photo ID
         blob_key = self.request.get('id')
-        if (blob_key is None):
+        if (core_util.is_missing(blob_key)):
             logging.error("[ImageViewHandler] missing id")
             self.error(404)
             return
 
+        # check user login
         if (littlecircle.Login.is_valid_sid(self.request.get('sid')) == False):
             logging.error("[ImageViewHandler] invalid session id")
             self.error(401)
             return
 
+        # get the photo size required
         size = self.request.get('size')
         logging.info("[ImageViewHandler] key: {} size: {}".format(blob_key, size))
 
@@ -194,7 +201,7 @@ class ImageViewHandler(webapp2.RequestHandler):
 class ImageDownloadHandler(blobstore_handlers.BlobstoreDownloadHandler):
     def get(self, resource):
         resource = str(urllib.unquote(resource))
-        if (resource is None):
+        if (core_util.is_missing(resource)):
             logging.error("[ImageDownloadHandler] missing resource")
             self.error(404)
             return
@@ -209,3 +216,44 @@ class ImageDownloadHandler(blobstore_handlers.BlobstoreDownloadHandler):
         name = blob_info.filename
         logging.info("[ImageDownloadHandler] {} ({})".format(name, size))
         self.send_blob(blob_info, save_as=name)
+
+class ImageDeleteHandler(webapp2.RequestHandler):
+    def get(self, url_sid, url_photo):
+        # get the photo ID
+        blob_key = str(urllib.unquote(url_photo))
+        if (core_util.is_missing(blob_key)):
+            logging.error("[ImageDeleteHandler] missing id")
+            self.error(404)
+            return
+
+        img = ndb.Key(littlecircle.Photo, blob_key).get()
+        if (img is None):
+            logging.error("[ImageDeleteHandler] missing image 123: {}".format(blob_key))
+            self.error(404)
+            return
+
+        # check user login
+        sid = str(urllib.unquote(url_sid))
+        login = littlecircle.Login.get_by_sid(sid)
+        if (login is None or login.is_valid() == False):
+            logging.error("[ImageDeleteHandler] invalid session id: {}".format(sid))
+            self.error(401)
+            return
+
+        # check if the photo is belonged to the user
+        k1 = img.owner
+        k2 = login.user
+        logging.info("[ImageDeleteHandler] owner: {}, login: {}".format(k1.id(), k2.id()))
+        if (k1 != k2):
+            logging.info("[ImageDeleteHandler] permission denied, image: {}".format(blob_key))
+            self.error(550) # permission denied
+            return
+
+        # delete photo (set inactive)
+        logging.info("[ImageDeleteHandler] delete image: {}".format(blob_key))
+        img.deletedBy = k2
+        img.deletedDate = datetime.datetime.now()
+        img.put()
+
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.out.write(littlecircle.Resp(status=1).to_json())
