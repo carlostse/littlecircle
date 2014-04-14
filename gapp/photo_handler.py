@@ -101,8 +101,15 @@ class ImageSearchHandler(webapp2.RequestHandler):
     def get(self, url_sid):
 
         # check user login
-        if (littlecircle.Login.is_valid_sid(str(urllib.unquote(url_sid))) == False):
-            logging.error("[ImageViewHandler] invalid session id")
+        if (core_util.is_missing(url_sid)):
+            logging.error("[ImageSearchHandler] missing session id")
+            self.error(401)
+            return
+            
+        sid = str(urllib.unquote(url_sid))
+        login = littlecircle.Login.get_by_sid(sid)
+        if (login is None or login.is_valid() == False):
+            logging.error("[ImageSearchHandler] invalid session id: {}".format(sid))
             self.error(401)
             return
 
@@ -112,7 +119,7 @@ class ImageSearchHandler(webapp2.RequestHandler):
 
         array = []
         for obj in list:
-            array.append(obj.to_dict())
+            array.append(obj.to_dict(login))
         logging.info("[ImageSearchHandler] number of photo: {}".format(len(array)))
         self.response.headers['Content-Type'] = 'application/json'
         self.response.out.write(json.dumps(array))

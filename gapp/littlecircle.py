@@ -78,9 +78,10 @@ class Photo(ndb.Model):
     uploadDate = ndb.DateTimeProperty(auto_now_add=True)
     deletedBy = ndb.KeyProperty()
     deletedDate = ndb.DateTimeProperty()
-    def to_dict(self):
+    def to_dict(self, login):
         return {'pkey': self.key.id(),
                 'owner': self.owner.string_id(),
+                'isOwner': login is not None and login.user == self.owner,
                 'datetime': core_util.date_to_str(self.photoDate),
                 'geo': core_util.geo_to_string(self.geo)}
 '''

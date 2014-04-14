@@ -520,7 +520,7 @@ aboutme = {
                             '</div>' +
                             */
                             '<a id="image_' + i + '" href="' + links[0] + '"><img src="/img/enlarge01.png" alt="enlarge" class="enlarge enlarge_' + i + '"></a>' +
-                            '<img src="/img/delete01.png" alt="delete" class="delete delete_' + i + '" onclick="aboutme.photo.remove(' + i + ')">' +
+                            (o.isOwner? '<img src="/img/delete01.png" alt="delete" class="delete delete_' + i + '" onclick="aboutme.photo.remove(' + i + ')">': '') +
                             links[1] +
                             (o.geo? '<a id="showmap_' + i + '" href="/app/map/' + o.geo + '"><button class="map map_' + i + '">Map</button></a>': '') +
                             '<button class="group group_' + i + '" onclick="aboutme.photo.click(' + i + ');">Group View</button>' +
