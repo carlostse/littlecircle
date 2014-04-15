@@ -402,6 +402,7 @@ div.loading {
     right: 0px;
     display: none;
     background:linear-gradient(to bottom, rgba(33, 65, 80, 0.2), rgba(17, 0, 48, 0.8));
+    z-index: 50;
 }
 div.loading div.loading_img {
     position: relative;

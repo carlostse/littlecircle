@@ -501,7 +501,7 @@ aboutme = {
             var p = aboutme.path.photo_view + '?sid=' + aboutme.user.sid + '&id=' + id;
             if (i == aboutme.photo.selectedIndex) p += '&size=1';
             return [p + '&size=2',
-                    '<img src="' + p + '" alt="photo" class="photo" id="img_' + i + '" ' +
+                    '<img src="' + p + '" alt="" class="photo" id="img_' + i + '" ' +
 //                      'onclick="aboutme.photo.click(' + i + ');" ' +
 //                      'onmouseover="aboutme.photo.resize(' + i + ');"' +
                     '>'];

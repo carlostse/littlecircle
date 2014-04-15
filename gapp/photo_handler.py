@@ -79,6 +79,10 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         if (orientation == 3):
             logging.info("[UploadHandler] rotate 180")
             img.rotate(180)
+            ''' Due to GAE's limitation, parse_source_metadata will only be done in execute_transforms
+                it makes preview is generated before img.rotate, therefore, we need to rotate it. 
+                But no need to parse_source_metadata again '''
+            preview = img.execute_transforms(output_encoding=images.JPEG, quality=LITTLECIRCLE_IMG_Q, parse_source_metadata=False)
 
         # make thumbnail
         img.resize(width=LITTLECIRCLE_THUMBNAIL_W)
