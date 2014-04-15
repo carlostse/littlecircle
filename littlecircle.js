@@ -12,19 +12,20 @@ var port = process.env.PORT || 3000;
 var app = express();
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
-//app.use(express.favicon());
-//app.use(express.logger('dev'));
 app.use(express.bodyParser());
 app.use(express.methodOverride());
-app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
+//app.use(express.favicon());
+//app.use(express.logger('dev'));
+//app.use(app.router);
 
 // development only
-if ('development' == app.get('env')) {
+var mode = app.get('env');
+mode = mode? mode: 'production';
+if ('development' == mode)
     app.use(express.errorHandler());
-}
+routes.log('main', 'Start in ' + mode + ' mode');
 
-app.get('/main', routes.index);
 app.get('/map/:geo', routes.map);
 
 var io = require('socket.io').listen(app.listen(port), {log: false});

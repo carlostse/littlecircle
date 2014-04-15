@@ -9,13 +9,6 @@ exports.log = function(ftn, msg){
 }
 
 /*
- * GET home page.
- */
-exports.index = function(req, res){
-    res.render('main', { title: 'Little Circle' });
-};
-
-/*
  * GET map page.
  */
 exports.map = function(req, res){

@@ -91,7 +91,7 @@ aboutme = {
     domain: window.location.hostname,
     path: {
         index: '/',
-        main: '/app/main',
+        main: '/main/',
         user_sync_url: '/gapp/user_sync',
         user_login_url: '/gapp/user_login',
         user_logout_url: '/gapp/user_logout',
