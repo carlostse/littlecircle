@@ -60,29 +60,35 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         meta = img.get_original_metadata()
         logging.debug("[UploadHandler] env: {}, dev: {}, meta: {}".format(env, dev, meta))
 
+        # date time
         dt = None
         if (dev == True):
             dt = datetime.datetime.now()
         elif ('DateTime' in meta):
             dt = core_util.exif_datetime_to_datetime(meta['DateTime'])
 
+        # location
         loc = None
         if (dev == True):
             loc = ndb.GeoPt(22.4182277, 114.2080536) # The Chinese University of Hong Kong
         elif ('GPSLatitude' in meta and 'GPSLongitude' in meta):
             loc = ndb.GeoPt(meta['GPSLatitude'], meta['GPSLongitude'])
 
-        orientation = meta['Orientation']
-        logging.info("[UploadHandler] photo taken at {} in location {}, orientation: {}".format(dt, loc, orientation))
-
         # orientation
+        orientation = 1
+        if ('Orientation' in meta):
+            orientation = meta['Orientation']
+
         if (orientation == 3):
             logging.info("[UploadHandler] rotate 180")
             img.rotate(180)
             ''' Due to GAE's limitation, parse_source_metadata will only be done in execute_transforms
-                it makes preview is generated before img.rotate, therefore, we need to rotate it. 
+                it makes preview is generated before img.rotate, therefore, we need to rotate it.
                 But no need to parse_source_metadata again '''
             preview = img.execute_transforms(output_encoding=images.JPEG, quality=LITTLECIRCLE_IMG_Q, parse_source_metadata=False)
+
+        # summary
+        logging.info("[UploadHandler] photo taken at {} in location {}, orientation: {}".format(dt, loc, orientation))
 
         # make thumbnail
         img.resize(width=LITTLECIRCLE_THUMBNAIL_W)

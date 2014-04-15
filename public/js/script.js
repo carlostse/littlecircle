@@ -453,8 +453,12 @@ aboutme = {
             });
         },
         progressCallback: function(e){
-//          if (e.lengthComputable)
-//              $('progress').attr({value:e.loaded, max:e.total});
+            if (e.lengthComputable){
+                var percentage = Math.round(e.loaded / e.total * 100) + '%';
+                console.log('[uploading] ' + e.loaded + '/' + e.total + ' = ' + percentage);
+                //$('progress').attr({value:e.loaded, max:e.total});
+                $('span.progress').html(percentage);
+            }
         },
         successCallback: function (data){
             if (!data){
