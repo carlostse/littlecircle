@@ -102,7 +102,7 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         k = p.put()
         logging.info("[UploadHandler] photo saved, key: {}".format(k.string_id()))
         self.response.headers['Content-Type'] = 'application/json'
-        self.response.out.write(json.dumps(p.to_dict()))
+        self.response.out.write(json.dumps(p.to_dict(login)))
 
 class ImageSearchHandler(webapp2.RequestHandler):
     def get(self, url_sid):
