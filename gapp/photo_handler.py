@@ -28,7 +28,6 @@ class UploadUrlHandler(webapp2.RequestHandler):
 
 class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
     def post(self):
-
         # check user login
         sid = self.request.get('sid')
         login = littlecircle.Login.get_by_sid(sid)
@@ -45,12 +44,10 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
             return
 
         upload_files = self.get_uploads('file')  # 'file' is file upload field in the form
-        logging.info("[UploadHandler] upload_files: {}".format(upload_files))
-
         blob_info = upload_files[0]
         blob_key = blob_info.key()
         size = blob_info.size
-        logging.info("[UploadHandler] size: {}".format(size))
+        logging.info("[UploadHandler] file size: {}".format(size))
 
         # make preview
         img = images.Image(blob_key=blob_key)
@@ -71,11 +68,17 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
 
         loc = None
         if (dev == True):
-            loc = ndb.GeoPt(22.4182277, 114.2080536)
+            loc = ndb.GeoPt(22.4182277, 114.2080536) # The Chinese University of Hong Kong
         elif ('GPSLatitude' in meta and 'GPSLongitude' in meta):
             loc = ndb.GeoPt(meta['GPSLatitude'], meta['GPSLongitude'])
 
-        logging.info("[UploadHandler] photo taken at {} in location {}".format(dt, loc))
+        orientation = meta['Orientation']
+        logging.info("[UploadHandler] photo taken at {} in location {}, orientation: {}".format(dt, loc, orientation))
+
+        # orientation
+        if (orientation == 3):
+            logging.info("[UploadHandler] rotate 180")
+            img.rotate(180)
 
         # make thumbnail
         img.resize(width=LITTLECIRCLE_THUMBNAIL_W)
@@ -105,7 +108,7 @@ class ImageSearchHandler(webapp2.RequestHandler):
             logging.error("[ImageSearchHandler] missing session id")
             self.error(401)
             return
-            
+
         sid = str(urllib.unquote(url_sid))
         login = littlecircle.Login.get_by_sid(sid)
         if (login is None or login.is_valid() == False):
