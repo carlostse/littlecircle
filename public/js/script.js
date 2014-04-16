@@ -502,9 +502,9 @@ aboutme = {
         originalWidth: 200,
         list: [],
         getPhotoLink: function(id, i){
-            var p = aboutme.path.photo_view + '?sid=' + aboutme.user.sid + '&id=' + id;
-            if (i == aboutme.photo.selectedIndex) p += '&size=1';
-            return [p + '&size=2',
+            var p = aboutme.path.photo_view + '?sid=' + aboutme.user.sid + '&amp;id=' + id;
+            if (i == aboutme.photo.selectedIndex) p += '&amp;size=1';
+            return [p + '&amp;size=2',
                     '<img src="' + p + '" alt="" class="photo" id="img_' + i + '" ' +
 //                      'onclick="aboutme.photo.click(' + i + ');" ' +
 //                      'onmouseover="aboutme.photo.resize(' + i + ');"' +
@@ -560,7 +560,7 @@ aboutme = {
             });
         },
         initEffect: function(i){
-            console.log('initEffect: ' + i);
+//          console.log('initEffect: ' + i);
             $('button.map_' + i).animate({opacity: 0}, "slow");
             $('button.group_' + i).animate({opacity: 0}, "slow");
             $('#img_' + i).fadeTo("slow", 1);
@@ -568,6 +568,7 @@ aboutme = {
             $('div.date_' + i).fadeTo("slow", 0);
             $('img.enlarge_' + i).fadeTo("slow", 0);
             $('img.delete_' + i).fadeTo("slow", 0);
+            // mouse over
             $('div.photo_' + i).mouseenter(function(){
                 $('button.map_' + i).animate({opacity: 1}, "slow");
                 $('button.group_' + i).animate({opacity: 1}, "slow");
@@ -577,6 +578,7 @@ aboutme = {
                 $('img.enlarge_' + i).fadeTo("slow", 1);
                 $('img.delete_' + i).fadeTo("slow", 1);
             });
+            // mouse out
             $('div.photo_' + i).mouseleave(function(){
                 $('button.map_' + i).animate({opacity: 0}, "slow");
                 $('button.group_' + i).animate({opacity: 0}, "slow");
