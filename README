@@ -1,0 +1,109 @@
+Little Circle is a CUHK IEMS5718 Internet Security and Web Development project.
+
+== Project Details and Requirements ==
+
+Topic 2: Private Social Network
+
+Basic Requirements
+Create a social network app for small groups of people, e.g. a small group of friends. The private social network should allow at least one of the following features within a private group:
+● A good way to schedule and plan events (where, when, and what)
+● An innovative way to share photo albums (e.g. like a magazine, or being interactive)
+● A good way to share travel ideas, plans and experiences
+
+You will get high marks if (in order of importance):
+1. The design is intuitive and features are user friendly
+2. The design looks clean and professional and appealing to mass market users
+3. The system is stable, functional and would not malfunction
+
+You will get significant bonus if:
+1. Your web app runs on mobile too (runs in the web browser on mobile, not as an native app)
+2. You can implement additional features that are listed, or alternatively some unlisted creative features that adds value to the overall design
+3. Your system allows users to login via multiple means (Google account or create specific accounts)
+
+You WILL NOT get bonus for:
+1. Adding excessive trivial features
+2. Make it look or function like Facebook
+3. Making it exceedingly beautiful
+
+You should choose this topic if:
+1. Your team is confident making web apps for consumer market
+2. You can create interfaces that meets basic industry standard
+3. You are creative and have new ideas on social network stuffs
+
+== Development Tools ==
+- Google App Engine:
+  https://developers.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python
+
+- SourceTree
+  http://www.sourcetreeapp.com/download/
+
+- WinSCP
+  http://winscp.net/eng/download.php#download2
+
+- Notepad++
+  http://notepad-plus-plus.org/download/v6.5.5.html
+
+== Login ==
+- WinSCP
+  1. File Protocol: SFTP
+  2. Host Name: aboutme.redirectme.net
+  3. Port Number: 22
+  4. User Name: iems5718
+  5. Extract the private.ppk from iems5718_login_key.zip
+  6. Advance -> SSH -> Authentication -> Private key file: private.ppk
+  7. You may save this profile
+
+== Misc ==
+- SourceTree Windows specific
+Choose <OpenSSH> and <check out as it> options
+
+- favicon generator
+http://www.favicon.cc/
+
+== Google App Engine Prerequisites ==
+
+Image Library PIL is required to run Google App Engine in local (dev) mode.
+
+- How to download PIL in Windows
+1. Install Python 2.7.x 32-bit (64-bit won't work)
+2. easy_install pil
+
+- How to build PIL in Mac OSX
+[Method 1]
+$ sudo -s
+# easy_install install pip
+# ARCHFLAGS=-Wno-error=unused-command-line-argument-hard-error-in-future pip install pil --allow-external pil --allow-unverified pil
+
+[Method 2]
+1. install brew
+2. brew install libjpeg
+3. download PIL http://www.pythonware.com/products/pil/
+4. edit setup.py in PIL
+- JPEG_ROOT = None
++ JPEG_ROOT = libinclude("/usr/local/Cellar/jpeg/8d")
+5. python setup.py build
+6. sudo python setup.py install
+
+== Run the project locally ==
+
+1. Change aboutme.redirectme.net to 127.0.0.1
+Win: edit C:\Windows\System32\drivers\etc\hosts
+OSX: edit /etc/hosts
+
+2. Start Nginx or Apache with preconfigured before
+
+3. Start Google App Engine
+Win: C:\Python27\python "C:\Program Files (x86)\Google\google_appengine\dev_appserver.py" --skip_sdk_update_check=yes --port=8080 --admin_port=8000 --log_level=debug <your iems5718-server path>\gapp
+OSX: python /usr/local/google_appengine/dev_appserver.py --skip_sdk_update_check=yes --port=8080 --admin_port=8000 --log_level=debug <your iems5718-server path>/gapp
+
+4. Start node.js
+node littlecircle.js OR npm start
+
+== Deploy to production ==
+
+[Deploy Google App Engine]
+C:\Python27\python "C:\Program Files (x86)\Google\google_appengine\appcfg.py" --no_cookies --skip_sdk_update_check --email=<your email> --passin update <your iems5718-server path>\gapp
+
+== Self-build Chromium ==
+Win: http://my.no-ip.info/carlos/pub/Chrome-36.0.1918.0.zip
+OSX: http://my.no-ip.info/carlos/pub/Chrome-36.0.1918.0.dmg
