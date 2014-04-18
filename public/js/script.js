@@ -310,7 +310,7 @@ aboutme = {
                 aboutme.chat.history.push(
                     '<tr>' +
                         '<td class="col_1">[' + obj.time + ']</td>' +
-                        '<td class="col_4" colspan="2">' + obj.user + ' changed the featured photo</td>' +
+                        '<td class="col_4" colspan="2">' + obj.user + aboutme.string.change_cover_photo + ' </td>' +
                     '</tr>'
                 );
                 aboutme.chat.reload();
@@ -689,7 +689,8 @@ aboutme = {
         }
     },
     string: {
-//        confirm_upload: 'Are you sure?'
+//          confirm_upload: 'Are you sure?',
+            change_cover_photo: ' changed the cover photo'
     }
 },
 util = {

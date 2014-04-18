@@ -98,8 +98,8 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         p = littlecircle.Photo(
             key=ndb.Key(littlecircle.Photo, str(blob_key)),
             owner=user.key,
-            #event=eventKey,
             size=size,
+            ori=orientation,
             geo=loc,
             photoDate=dt,
             preview=preview,
@@ -158,67 +158,66 @@ class ImageViewHandler(webapp2.RequestHandler):
         size = self.request.get('size')
         logging.info("[ImageViewHandler] key: {} size: {}".format(blob_key, size))
 
+        # get the stored photo
+        img = ndb.Key(littlecircle.Photo, blob_key).get()
+        if (img is None):
+            logging.error("[ImageViewHandler] cannot find image: {}".format(blob_key))
+            self.error(404)
+            return
+
         if size == '2':
-            logging.info("[ImageViewHandler] send size: {}".format(blob_key))
-            self.redirect('/download/%s' % blob_key)
+            logging.info("[ImageViewHandler] send full: {}".format(blob_key))
+            logging.info("[ImageViewHandler] orientation: {}".format(img.ori))
+            self.redirect("/download/{}?ori={}".format(blob_key, img.ori))
+
         elif size == '1':
             logging.info("[ImageViewHandler] send preview")
             try:
-                # get the stored photo
-                img = ndb.Key(littlecircle.Photo, blob_key).get()
-                if (img is None):
-                    raise Exception("[ImageViewHandler] cannot find image: {}".format(blob_key))
-                else:
-                    # get the stored preview
-                    preview = img.preview
+                # get the stored preview
+                preview = img.preview
+                if (preview is None):
+                    logging.info("[ImageViewHandler] preview not found, try to make it")
+                    fullImg = images.Image(blob_key=blob_key)
+                    fullImg.resize(width=LITTLECIRCLE_PREVIEW_W)
+                    preview = fullImg.execute_transforms(output_encoding=images.JPEG, quality=LITTLECIRCLE_IMG_Q)
                     if (preview is None):
-                        logging.info("[ImageViewHandler] preview not found, try to make it")
-                        fullImg = images.Image(blob_key=blob_key)
-                        fullImg.resize(width=LITTLECIRCLE_PREVIEW_W)
-                        preview = fullImg.execute_transforms(output_encoding=images.JPEG, quality=LITTLECIRCLE_IMG_Q)
-                        if (preview is None):
-                            raise Exception("[ImageViewHandler] cannot make preview: {}".format(blob_key))
+                        raise Exception("[ImageViewHandler] cannot make preview: {}".format(blob_key))
 
-                        logging.debug("[ImageViewHandler] save back the preview")
-                        img.preview = preview
-                        img.put()
-                    else:
-                        logging.debug("[ImageViewHandler] found stored preview")
+                    logging.debug("[ImageViewHandler] save back the preview")
+                    img.preview = preview
+                    img.put()
+                else:
+                    logging.debug("[ImageViewHandler] found stored preview")
 
-                    self.response.out.write(preview)
+                self.response.out.write(preview)
             except:
                 logging.error("[ImageViewHandler] except: {}".format(sys.exc_info()))
                 self.error(404)
         else:
             logging.info("[ImageViewHandler] send thumbnail")
             try:
-                # get the stored photo
-                img = ndb.Key(littlecircle.Photo, blob_key).get()
-                if (img is None):
-                    raise Exception("[ImageViewHandler] cannot find image: {}".format(blob_key))
-                else:
-                    # get the stored thumbnail
-                    thumbnail = img.thumbnail
+                # get the stored thumbnail
+                thumbnail = img.thumbnail
+                if (thumbnail is None):
+                    logging.info("[ImageViewHandler] thumbnail not found, try to make it")
+                    fullImg = images.Image(blob_key=blob_key)
+                    fullImg.resize(width=LITTLECIRCLE_THUMBNAIL_W)
+                    thumbnail = fullImg.execute_transforms(output_encoding=images.JPEG, quality=LITTLECIRCLE_IMG_Q)
                     if (thumbnail is None):
-                        logging.info("[ImageViewHandler] thumbnail not found, try to make it")
-                        fullImg = images.Image(blob_key=blob_key)
-                        fullImg.resize(width=LITTLECIRCLE_THUMBNAIL_W)
-                        thumbnail = fullImg.execute_transforms(output_encoding=images.JPEG, quality=LITTLECIRCLE_IMG_Q)
-                        if (thumbnail is None):
-                            raise Exception("[ImageViewHandler] cannot make thumbnail: {}".format(blob_key))
+                        raise Exception("[ImageViewHandler] cannot make thumbnail: {}".format(blob_key))
 
-                        logging.debug("[ImageViewHandler] save back the thumbnail")
-                        img.thumbnail = thumbnail
-                        img.put()
-                    else:
-                        logging.debug("[ImageViewHandler] found stored thumbnail")
+                    logging.debug("[ImageViewHandler] save back the thumbnail")
+                    img.thumbnail = thumbnail
+                    img.put()
+                else:
+                    logging.debug("[ImageViewHandler] found stored thumbnail")
 
-                    self.response.out.write(thumbnail)
+                self.response.out.write(thumbnail)
             except:
                 logging.error("[ImageViewHandler] except: {}".format(sys.exc_info()))
                 self.error(404)
 
-class ImageDownloadHandler(blobstore_handlers.BlobstoreDownloadHandler):
+class ImageDownloadHandler(webapp2.RequestHandler): #blobstore_handlers.BlobstoreDownloadHandler
     def get(self, resource):
         resource = str(urllib.unquote(resource))
         if (core_util.is_missing(resource)):
@@ -232,10 +231,22 @@ class ImageDownloadHandler(blobstore_handlers.BlobstoreDownloadHandler):
             self.error(404)
             return
 
+        rotate = 0
+        orientation = self.request.get('ori')
+        logging.debug("[ImageDownloadHandler] orientation: {}".format(orientation))
+
+        img = images.Image(blob_key=blob_info)
+        if orientation == '3':
+            logging.info("[ImageDownloadHandler] roate image")
+            rotate = 180
+
         size = blob_info.size
         name = blob_info.filename
         logging.info("[ImageDownloadHandler] {} ({})".format(name, size))
-        self.send_blob(blob_info, save_as=name)
+        # self.send_blob(blob_info, save_as=name)
+        img.rotate(rotate)
+        self.response.headers['Content-Type'] = 'image/jpeg'
+        self.response.out.write(img.execute_transforms(output_encoding=images.JPEG, quality=LITTLECIRCLE_IMG_Q))
 
 class ImageDeleteHandler(webapp2.RequestHandler):
     def get(self, url_sid, url_photo):
@@ -248,7 +259,7 @@ class ImageDeleteHandler(webapp2.RequestHandler):
 
         img = ndb.Key(littlecircle.Photo, blob_key).get()
         if (img is None):
-            logging.error("[ImageDeleteHandler] missing image 123: {}".format(blob_key))
+            logging.error("[ImageDeleteHandler] missing image: {}".format(blob_key))
             self.error(404)
             return
 

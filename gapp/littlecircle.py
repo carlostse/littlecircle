@@ -71,6 +71,7 @@ class Photo(ndb.Model):
     owner = ndb.KeyProperty()
     #event = ndb.KeyProperty()
     size = ndb.IntegerProperty()
+    ori = ndb.IntegerProperty()
     geo = ndb.GeoPtProperty()
     photoDate = ndb.DateTimeProperty(auto_now_add=True)
     preview = ndb.BlobProperty(indexed=False)
