@@ -527,7 +527,7 @@ aboutme = {
                             (o.isOwner? '<img src="/img/delete01.png" alt="delete" class="delete delete_' + i + '" onclick="aboutme.photo.remove(' + i + ')">': '') +
                             links[1] +
                             (o.geo? '<a id="showmap_' + i + '" href="/app/map/' + o.geo + '"><button class="map map_' + i + '">Map</button></a>': '') +
-                            '<button class="group group_' + i + '" onclick="aboutme.photo.click(' + i + ');">Group View</button>' +
+                            '<button class="group group_' + i + '" onclick="aboutme.photo.click(' + i + ');">Expand</button>' +
                             '<div class="date date_' + i + '">' + o.datetime + '</div>' +
                         '</div>' +
                     '</td>';
@@ -572,7 +572,8 @@ aboutme = {
             $('div.photo_' + i).mouseenter(function(){
                 $('button.map_' + i).animate({opacity: 1}, "slow");
                 $('button.group_' + i).animate({opacity: 1}, "slow");
-                $('#img_' + i).fadeTo("slow", 0.4);
+                //$('#img_' + i).fadeTo("slow", 0.4);
+                $('#img_' + i).toggleClass("imgblur");
                 $('#img_' + i).css("z-index", "0");
                 $('div.date_' + i).fadeTo("slow", 1);
                 $('img.enlarge_' + i).fadeTo("slow", 1);
@@ -582,7 +583,8 @@ aboutme = {
             $('div.photo_' + i).mouseleave(function(){
                 $('button.map_' + i).animate({opacity: 0}, "slow");
                 $('button.group_' + i).animate({opacity: 0}, "slow");
-                $('#img_' + i).fadeTo("slow", 1);
+                //$('#img_' + i).fadeTo("slow", 1);
+                $('#img_' + i).toggleClass("imgblur");
                 $('#img_' + i).css("z-index", "2");
                 $('div.date_' + i).fadeTo("slow", 0);
                 $('img.enlarge_' + i).fadeTo("slow", 0);
@@ -594,7 +596,7 @@ aboutme = {
                    row == aboutme.photo.secondAffected? aboutme.photo.numOfPhotoPerRow - 2: aboutme.photo.numOfPhotoPerRow;
         },
         reload: function(){
-            var html = '<table><tr>' // cannot append to div directly due to threading problem
+            var html = '<table class="table1"><tr>' // cannot append to div directly due to threading problem
               , maps = []
               , idx = aboutme.photo.list.length - 1
               , large = aboutme.photo.list.length > 5; // only show large photo if number of photo > 5
