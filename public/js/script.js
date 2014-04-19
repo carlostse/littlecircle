@@ -375,13 +375,12 @@ aboutme = {
                 url: aboutme.path.upload_url
             }).done(function(data){
                 if (!data){
-                    alert(['Your request cannot be processed, please try again later.<br>Ref. #' + 500]);
+                    $('a.create_event').css('visibility', 'visible');
+                    //alert(['Your request cannot be processed, please try again later.<br>Ref. #' + 500]);
                     return;
                 }
                 aboutme.upload.url = data;
                 $('a.create_event').css('visibility', 'visible');
-
-
             });
         },
         validate: function(){
@@ -477,8 +476,23 @@ aboutme = {
 
             // get new upload URL
             aboutme.upload.prepare();
+            
+            //upload success acknowledgement
+            $('#glassDiv').css('display', 'inline');
+            $('#dialog-head3').css('display', 'none');
+            $('#dialog-head2').css('display', 'none'); 
+            $('#dialog-head1').css('display', 'block');
+            $('#dialog-head0').css('display', 'none');
         },
         errorCallback: function (error){
+            
+            //upload fail acknowledgement
+            $('#glassDiv').css('display', 'inline');
+            $('#dialog-head3').css('display', 'none');
+            $('#dialog-head2').css('display', 'none'); 
+            $('#dialog-head1').css('display', 'none');
+            $('#dialog-head0').css('display', 'block');
+
             console.log('upload error: ' + JSON.stringify(error));
 
             if (error.status == 401){
@@ -681,10 +695,19 @@ aboutme = {
                 }
                 aboutme.photo.list.splice(i, 1);
                 aboutme.photo.reload();
-
+                $('#glassDiv').css('display', 'inline');
+                $('#dialog-head3').css('display', 'block');
+                $('#dialog-head2').css('display', 'none'); 
+                $('#dialog-head1').css('display', 'none'); 
+                $('#dialog-head0').css('display', 'none'); 
             }).fail(function(data){
                 console.log(JSON.stringify(data));
                 alert(['Your request cannot be processed, please try again later.<br>Ref. #' + (data.status? data.status: 500)]);
+                $('#glassDiv').css('display', 'inline');
+                $('#dialog-head2').css('display', 'block');
+                $('#dialog-head3').css('display', 'none');
+                $('#dialog-head1').css('display', 'none');
+                $('#dialog-head0').css('display', 'none');              
             });
         }
     },
@@ -747,3 +770,6 @@ function alert(messages){
     $($('img.icon').get(1)).css('display', success? 'inline': 'none');
     $('div.base').css('display', msg? 'inline': 'none');
 }
+var myClickFunc2 = function(){
+    $('#glassDiv').css('display', 'none');
+};
