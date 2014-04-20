@@ -43,7 +43,14 @@ You should choose this topic if:
 - Notepad++
   http://notepad-plus-plus.org/download/v6.5.5.html
 
-== Login ==
+== Source Code ==
+- GitHub
+https://github.com/copperoxide/littlecircle.git
+
+- Server
+ssh://iems5718@my.no-ip.info/home/iems5718/iems5718-server-src.git
+
+== Server Login ==
 - WinSCP
   1. File Protocol: SFTP
   2. Host Name: aboutme.redirectme.net
