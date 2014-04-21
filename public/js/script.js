@@ -476,25 +476,17 @@ aboutme = {
 
             // get new upload URL
             aboutme.upload.prepare();
-            
-            //upload success acknowledgement
-            $('#glassDiv').css('display', 'inline');
-            $('#dialog-head3').css('display', 'none');
-            $('#dialog-head2').css('display', 'none'); 
-            $('#dialog-head1').css('display', 'block');
-            $('#dialog-head0').css('display', 'none');
+
+            // upload success acknowledgement
+            $('div.information').css('display', 'inline');
+            var box = $('div.information-dialog');
+            box.css('display', 'block');
+            box.html(aboutme.string.upload_successfully);
         },
         errorCallback: function (error){
-            
-            //upload fail acknowledgement
-            $('#glassDiv').css('display', 'inline');
-            $('#dialog-head3').css('display', 'none');
-            $('#dialog-head2').css('display', 'none'); 
-            $('#dialog-head1').css('display', 'none');
-            $('#dialog-head0').css('display', 'block');
-
             console.log('upload error: ' + JSON.stringify(error));
 
+            // redirect to login page
             if (error.status == 401){
                 window.location = aboutme.path.index
                 return;
@@ -503,6 +495,7 @@ aboutme = {
             // close the loading box
             $('div.loading').css('display', 'none');
 
+            // upload fail acknowledgement
             var ref = error.statusText? error.statusText: '#500';
             alert(['Your request cannot be processed, please try again later.<br>Ref. ' + ref]);
         }
@@ -610,7 +603,7 @@ aboutme = {
                    row == aboutme.photo.secondAffected? aboutme.photo.numOfPhotoPerRow - 2: aboutme.photo.numOfPhotoPerRow;
         },
         reload: function(){
-            var html = '<table class="table1"><tr>' // cannot append to div directly due to threading problem
+            var html = '<table class="photo"><tr>' // cannot append to div directly due to threading problem
               , maps = []
               , idx = aboutme.photo.list.length - 1
               , large = aboutme.photo.list.length > 5; // only show large photo if number of photo > 5
@@ -695,25 +688,23 @@ aboutme = {
                 }
                 aboutme.photo.list.splice(i, 1);
                 aboutme.photo.reload();
-                $('#glassDiv').css('display', 'inline');
-                $('#dialog-head3').css('display', 'block');
-                $('#dialog-head2').css('display', 'none'); 
-                $('#dialog-head1').css('display', 'none'); 
-                $('#dialog-head0').css('display', 'none'); 
+
+                $('div.information').css('display', 'inline');
+                var box = $('div.information-dialog');
+                box.css('display', 'block');
+                box.html(aboutme.string.remove_successfully);
+
             }).fail(function(data){
                 console.log(JSON.stringify(data));
                 alert(['Your request cannot be processed, please try again later.<br>Ref. #' + (data.status? data.status: 500)]);
-                $('#glassDiv').css('display', 'inline');
-                $('#dialog-head2').css('display', 'block');
-                $('#dialog-head3').css('display', 'none');
-                $('#dialog-head1').css('display', 'none');
-                $('#dialog-head0').css('display', 'none');              
             });
         }
     },
     string: {
 //          confirm_upload: 'Are you sure?',
-            change_cover_photo: ' changed the cover photo'
+            change_cover_photo: ' changed the cover photo',
+            upload_successfully: 'Upload Successfully',
+            remove_successfully: 'Remove Successfully'
     }
 },
 util = {
@@ -770,6 +761,6 @@ function alert(messages){
     $($('img.icon').get(1)).css('display', success? 'inline': 'none');
     $('div.base').css('display', msg? 'inline': 'none');
 }
-var myClickFunc2 = function(){
-    $('#glassDiv').css('display', 'none');
+function infoBtn(){
+    $('div.information').css('display', 'none');
 };
