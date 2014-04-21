@@ -102,6 +102,7 @@ aboutme = {
     },
     maxChatHistory: 10,
     maxPhotoSize: 10, // MB
+    autoCloseTimeout: 800,
     socketPort: 3000,
     socket: null,
     user: {
@@ -477,11 +478,24 @@ aboutme = {
             // get new upload URL
             aboutme.upload.prepare();
 
-            // upload success acknowledgement
+            // successful acknowledgement
             $('div.information').css('display', 'inline');
-            var box = $('div.information-dialog');
+            var box = $('div.information-dialog')
+              , btn1 = $('input.button1')
+              , btn2 = $('input.button2');
+
             box.css('display', 'block');
             box.html(aboutme.string.upload_successfully);
+
+            btn1.click(function(){
+                infoBtn();
+            });
+            btn1.prop('value', aboutme.string.ok);
+            btn1.css('display', 'inline');
+            btn2.css('display', 'none');
+
+            // auto close acknowledgement
+            setTimeout(infoBtn, aboutme.autoCloseTimeout);
         },
         errorCallback: function (error){
             console.log('upload error: ' + JSON.stringify(error));
@@ -531,7 +545,7 @@ aboutme = {
                             '</div>' +
                             */
                             '<a id="image_' + i + '" href="' + links[0] + '"><img src="/img/enlarge01.png" alt="enlarge" class="enlarge enlarge_' + i + '"></a>' +
-                            (o.isOwner? '<img src="/img/delete01.png" alt="delete" class="delete delete_' + i + '" onclick="aboutme.photo.remove(' + i + ')">': '') +
+                            (o.isOwner? '<img src="/img/delete01.png" alt="delete" class="delete delete_' + i + '" onclick="aboutme.photo.confirmRemove(' + i + ')">': '') +
                             links[1] +
                             (o.geo? '<a id="showmap_' + i + '" href="/app/map/' + o.geo + '"><button class="map map_' + i + '">Map</button></a>': '') +
                             '<button class="group group_' + i + '" onclick="aboutme.photo.click(' + i + ');">Expand</button>' +
@@ -675,6 +689,27 @@ aboutme = {
             aboutme.photo.list[i] = featured;
             aboutme.photo.reload();
         },
+        confirmRemove: function(i){
+            $('div.information').css('display', 'inline');
+            var box = $('div.information-dialog')
+              , btn1 = $('input.button1')
+              , btn2 = $('input.button2');
+
+            box.css('display', 'block');
+            box.html(aboutme.string.confirm_remove);
+
+            btn1.click(function(){
+                infoBtn(aboutme.photo.remove(i));
+            });
+            btn1.prop('value', aboutme.string.yes);
+            btn1.css('display', 'inline');
+
+            btn2.prop('value', aboutme.string.no);
+            btn2.click(function(){
+                infoBtn();
+            });
+            btn2.css('display', 'inline');
+        },
         remove: function(i){
             var pkey = aboutme.photo.list[i].pkey;
             console.log('[remove] photo: ' + pkey);
@@ -689,10 +724,24 @@ aboutme = {
                 aboutme.photo.list.splice(i, 1);
                 aboutme.photo.reload();
 
+                // successful acknowledgement
                 $('div.information').css('display', 'inline');
-                var box = $('div.information-dialog');
+                var box = $('div.information-dialog')
+                  , btn1 = $('input.button1')
+                  , btn2 = $('input.button2');
+
                 box.css('display', 'block');
                 box.html(aboutme.string.remove_successfully);
+
+                btn1.click(function(){
+                    infoBtn();
+                });
+                btn1.prop('value', aboutme.string.ok);
+                btn1.css('display', 'inline');
+                btn2.css('display', 'none');
+
+                // auto close acknowledgement
+                setTimeout(infoBtn, aboutme.autoCloseTimeout);
 
             }).fail(function(data){
                 console.log(JSON.stringify(data));
@@ -704,7 +753,11 @@ aboutme = {
 //          confirm_upload: 'Are you sure?',
             change_cover_photo: ' changed the cover photo',
             upload_successfully: 'Upload Successfully',
-            remove_successfully: 'Remove Successfully'
+            remove_successfully: 'Remove Successfully',
+            ok: 'OK',
+            yes: 'Yes',
+            no: 'No',
+            confirm_remove: 'Are you sure to remove this photo?'
     }
 },
 util = {
@@ -761,6 +814,7 @@ function alert(messages){
     $($('img.icon').get(1)).css('display', success? 'inline': 'none');
     $('div.base').css('display', msg? 'inline': 'none');
 }
-function infoBtn(){
+function infoBtn(callback){
     $('div.information').css('display', 'none');
+    if (callback) callback();
 };
