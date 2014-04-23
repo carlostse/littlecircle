@@ -64,6 +64,11 @@ io.sockets.on('connection', function (socket) {
         if (data && data.user && data.photo)
             io.sockets.emit('photo', JSON.stringify({time: moment().format('HH:mm:ss'), user: data.user.name, photo: data.photo}));
     });
+    socket.on('album', function(data) {
+        routes.log('io.sockets', 'album: ' + JSON.stringify(data));
+        if (data && data.user) // data.photo may be equal 0
+            io.sockets.emit('album', JSON.stringify({time: moment().format('HH:mm:ss'), user: data.user.name, sid: data.user.sid, photo: data.photo, type: data.type}));
+    });
     socket.on('disconnect', function() {
         routes.log('io.sockets', 'someone disconnect');
     });

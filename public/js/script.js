@@ -239,6 +239,7 @@ aboutme = {
             aboutme.socket.on('online', aboutme.chat.online);
             aboutme.socket.on('message', aboutme.chat.receive);
             aboutme.socket.on('photo', aboutme.chat.photo);
+            aboutme.socket.on('album', aboutme.chat.album);
         });
     },
     chat: {
@@ -250,8 +251,8 @@ aboutme = {
             }
         },
         send: function(){
-            var box = $('textarea.chat_message');
-            var msg = box.val();
+            var box = $('textarea.chat_message')
+              , msg = box.val();
             if (msg){
                 var send = {user: aboutme.user, message: msg};
                 console.log(send.user.name + ': ' + send.message);
@@ -316,6 +317,42 @@ aboutme = {
                 );
                 aboutme.chat.reload();
                 aboutme.photo.featured(obj.photo);
+            }
+        },
+        album: function(data) {
+            if (!data) {
+                console.log('[album] data is null');
+                return;
+            }
+            var obj = JSON.parse(data);
+            if (!obj.time || !obj.user || !obj.sid ||
+                !obj.type || (obj.type != aboutme.photo.uploaded && obj.type != aboutme.photo.removed)){
+                console.log('[album] data invalid: ' + data);
+                return;
+            }
+            var add = obj.type == aboutme.photo.uploaded
+              , msg = obj.user + (add? aboutme.string.uploaded_photo: aboutme.string.removed_photo);
+            console.log('[album] ' + msg);
+            aboutme.chat.history.push(
+                '<tr>' +
+                    '<td class="col_1">[' + obj.time + ']</td>' +
+                    '<td class="col_4" colspan="2">' + msg + ' </td>' +
+                '</tr>'
+            );
+            aboutme.chat.reload();
+
+            // add/remove and reload if the action is performed by others
+            if (obj.sid != aboutme.user.sid){
+                if (add){
+                    // although the client can hack it, the server will check the access right again when perform delete
+                    obj.photo.isOwner = false;
+                    console.log('[album] add: ' + JSON.stringify(obj.photo));
+                    aboutme.photo.list.push(obj.photo);
+                } else {
+                    console.log('[album] remove: ' + obj.photo);
+                    aboutme.photo.list.splice(obj.photo, 1);
+                }
+                aboutme.photo.reload();
             }
         }
     },
@@ -469,6 +506,9 @@ aboutme = {
             aboutme.photo.list.push(data);
             aboutme.photo.reload();
 
+            // emit message
+            aboutme.socket.emit('album', {photo: data, user: aboutme.user, type: aboutme.photo.uploaded});
+
             // close the loading box
             $('div.loading').css('display', 'none');
 
@@ -521,6 +561,8 @@ aboutme = {
         secondAffected: -1,
         numOfPhotoPerRow: 4,
         originalWidth: 200,
+        uploaded: 1,
+        removed: 2,
         list: [],
         getPhotoLink: function(id, i){
             var p = aboutme.path.photo_view + '?sid=' + aboutme.user.sid + '&amp;id=' + id;
@@ -721,6 +763,10 @@ aboutme = {
                     alert(['Your request cannot be processed, please try again later.<br>Ref. #' + 500]);
                     return;
                 }
+                // emit message
+                aboutme.socket.emit('album', {photo: i, user: aboutme.user, type: aboutme.photo.removed});
+
+                // remove and reload
                 aboutme.photo.list.splice(i, 1);
                 aboutme.photo.reload();
 
@@ -750,14 +796,18 @@ aboutme = {
         }
     },
     string: {
-//          confirm_upload: 'Are you sure?',
-            change_cover_photo: ' changed the cover photo',
-            upload_successfully: 'Upload Successfully',
-            remove_successfully: 'Remove Successfully',
+            // alert messages
             ok: 'OK',
             yes: 'Yes',
             no: 'No',
-            confirm_remove: 'Are you sure to remove this photo?'
+//          confirm_upload: 'Are you sure?',
+            confirm_remove: 'Are you sure to remove this photo?',
+            upload_successfully: 'Upload Successfully',
+            remove_successfully: 'Remove Successfully',
+            // web socket
+            change_cover_photo: ' changed the cover photo',
+            uploaded_photo: ' uploaded a new photo',
+            removed_photo: ' removed a photo'
     }
 },
 util = {
