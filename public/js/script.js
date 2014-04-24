@@ -170,7 +170,7 @@ aboutme = {
                 return;
             }
             aboutme.user.sid = data.sid
-            console.log('sid: ' + aboutme.user.sid);
+            console.log('[userLogin] sid: ' + aboutme.user.sid);
             if (callback)callback();
         });
     },
@@ -275,7 +275,7 @@ aboutme = {
             aboutme.chat.reload();
         },
         online: function(data){
-            console.log('online: ' + data);
+            console.log('[online] ' + data);
             if (!data) return;
             var obj = JSON.parse(data);
             if (!obj.time || !obj.user) return;
@@ -288,7 +288,7 @@ aboutme = {
             aboutme.chat.reload();
         },
         reload: function(){
-            console.log('chat.history.length: ' + aboutme.chat.history.length);
+            console.log('[chat] num of msg: ' + aboutme.chat.history.length);
             if (aboutme.chat.history.length >  aboutme.maxChatHistory)
                 aboutme.chat.history = aboutme.chat.history.slice(1, aboutme.maxChatHistory + 1);
             var tbl = $('table.chat_history');
@@ -305,7 +305,7 @@ aboutme = {
                 console.log(send.user.name + ': ' + send.photo);
                 aboutme.socket.emit('photo', send);
             } else {
-                console.log('photo: ' + data);
+                console.log('[photo] ' + data);
                 if (!data) return;
                 var obj = JSON.parse(data);
                 if (!obj.time || !obj.user) return;
@@ -563,36 +563,37 @@ aboutme = {
         originalWidth: 200,
         uploaded: 1,
         removed: 2,
+        large: false,
         list: [],
         getPhotoLink: function(id, i){
-            var p = aboutme.path.photo_view + '?sid=' + aboutme.user.sid + '&amp;id=' + id;
+            var p = aboutme.path.photo_view + '?sid=' + aboutme.user.sid + '&amp;id=' + id
+              , f = p + '&amp;size=2';
             if (i == aboutme.photo.selectedIndex) p += '&amp;size=1';
-            return [p + '&amp;size=2',
+            return [f,
                     '<img src="' + p + '" alt="" class="photo" id="img_' + i + '" ' +
 //                      'onclick="aboutme.photo.click(' + i + ');" ' +
 //                      'onmouseover="aboutme.photo.resize(' + i + ');"' +
                     '>'];
         },
-        getPhotoCell: function(o, i){
+        getPhotoFrame: function(o, i){
             var links = aboutme.photo.getPhotoLink(o.pkey, i);
+//          return links[1] +
+//          '<div class="blackbg blackbg_' + i + '">&nbsp;</div>' +
+//          '<div class="date date_' + i + '">' + o.datetime + '</div>' +
+//          '<div class="geo geo_' + i + '">' +
+//              '<a id="image_' + i + '" href="' + links[0] + '">full size</a>' +
+//              (o.geo? ' / <a id="map_' + i + '" href="/app/map/' + o.geo + '">show map</a>': '') +
+//          '</div>';
+            return '<a id="image_' + i + '" href="' + links[0] + '"><img src="/img/enlarge01.png" alt="enlarge" class="enlarge enlarge_' + i + '"></a>' +
+            (o.isOwner? '<img src="/img/delete01.png" alt="delete" class="delete delete_' + i + '" onclick="aboutme.photo.confirmRemove(' + i + ')">': '') +
+            links[1] +
+            (o.geo? '<a id="showmap_' + i + '" href="/app/map/' + o.geo + '"><button class="map map_' + i + '">' + aboutme.string.map + '</button></a>': '') +
+            (i > 0? '<button class="group group_' + i + '" onclick="aboutme.photo.click(' + i + ');">' + aboutme.string.expand + '</button>': '') +
+            '<div class="date date_' + i + '">' + o.datetime + '</div>';
+        },
+        getPhotoCell: function(o, i){
             return  '<td ' + (i == aboutme.photo.selectedIndex? 'colspan="2" rowspan="2"': '') + '>' +
-                        '<div class="photo photo_' + i + '">' +
-                            /*
-                            links[1] +
-                            '<div class="blackbg blackbg_' + i + '">&nbsp;</div>' +
-                            '<div class="date date_' + i + '">' + o.datetime + '</div>' +
-                            '<div class="geo geo_' + i + '">' +
-                                '<a id="image_' + i + '" href="' + links[0] + '">full size</a>' +
-                                (o.geo? ' / <a id="map_' + i + '" href="/app/map/' + o.geo + '">show map</a>': '') +
-                            '</div>' +
-                            */
-                            '<a id="image_' + i + '" href="' + links[0] + '"><img src="/img/enlarge01.png" alt="enlarge" class="enlarge enlarge_' + i + '"></a>' +
-                            (o.isOwner? '<img src="/img/delete01.png" alt="delete" class="delete delete_' + i + '" onclick="aboutme.photo.confirmRemove(' + i + ')">': '') +
-                            links[1] +
-                            (o.geo? '<a id="showmap_' + i + '" href="/app/map/' + o.geo + '"><button class="map map_' + i + '">Map</button></a>': '') +
-                            '<button class="group group_' + i + '" onclick="aboutme.photo.click(' + i + ');">Expand</button>' +
-                            '<div class="date date_' + i + '">' + o.datetime + '</div>' +
-                        '</div>' +
+                        '<div class="photo photo_' + i + '">' + aboutme.photo.getPhotoFrame(o, i) + '</div>' +
                     '</td>';
         },
         search: function(){
@@ -661,12 +662,12 @@ aboutme = {
         reload: function(){
             var html = '<table class="photo"><tr>' // cannot append to div directly due to threading problem
               , maps = []
-              , idx = aboutme.photo.list.length - 1
-              , large = aboutme.photo.list.length > 5; // only show large photo if number of photo > 5
+              , idx = aboutme.photo.list.length - 1;
 
-            aboutme.photo.selectedIndex = large? 0: -1;
-            aboutme.photo.firstAffected = large? 1: -1;
-            aboutme.photo.secondAffected = large? 2: -1;
+            aboutme.photo.large = aboutme.photo.list.length > 5; // only show large photo if number of photo > 5
+            aboutme.photo.selectedIndex = aboutme.photo.large? 0: -1;
+            aboutme.photo.firstAffected = aboutme.photo.large? 1: -1;
+            aboutme.photo.secondAffected = aboutme.photo.large? 2: -1;
 
             // display photo
             var row = 1, col = 1;
@@ -702,8 +703,9 @@ aboutme = {
             });
 
             // adjust size
-            aboutme.photo.resize(-1);
+            aboutme.photo.resize(aboutme.photo.selectedIndex);
 
+            // init map iframe
             maps.forEach(function(o){
                 aboutme.photo.initFancyBox('showmap', o, 'iframe');
             });
@@ -726,10 +728,23 @@ aboutme = {
             aboutme.chat.photo(i, true);
         },
         featured: function(i){
-            var featured = aboutme.photo.list[0];
+            console.log('[featured] index: ' + i + ', size: ' + aboutme.photo.list.length);
+            var f = aboutme.photo.list[0];
             aboutme.photo.list[0] = aboutme.photo.list[i];
-            aboutme.photo.list[i] = featured;
-            aboutme.photo.reload();
+            aboutme.photo.list[i] = f;
+//          aboutme.photo.reload(); 
+            // don't reload it, just swap
+            aboutme.photo.selectedIndex = aboutme.photo.large? 0: -1;
+            console.log('[featured] selected index: ' + aboutme.photo.selectedIndex);
+            $('div.photo_' + 0).html(aboutme.photo.getPhotoFrame(aboutme.photo.list[0], 0));
+            $('div.photo_' + i).html(aboutme.photo.getPhotoFrame(aboutme.photo.list[i], i));
+            aboutme.photo.resize(aboutme.photo.selectedIndex);
+            // init effects
+            aboutme.photo.initFancyBox('image', 0);
+            aboutme.photo.initFancyBox('image', i);
+            // init map iframe
+            aboutme.photo.initFancyBox('showmap', 0, 'iframe');
+            aboutme.photo.initFancyBox('showmap', i, 'iframe');
         },
         confirmRemove: function(i){
             $('div.information').css('display', 'inline');
@@ -807,7 +822,10 @@ aboutme = {
             // web socket
             change_cover_photo: ' changed the cover photo',
             uploaded_photo: ' uploaded a new photo',
-            removed_photo: ' removed a photo'
+            removed_photo: ' removed a photo',
+            // interface
+            map: 'Map',
+            expand: 'Expand'
     }
 },
 util = {

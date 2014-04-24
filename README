@@ -60,16 +60,20 @@ ssh://iems5718@my.no-ip.info/home/iems5718/iems5718-server-src.git
   6. Advance -> SSH -> Authentication -> Private key file: private.ppk
   7. You may save this profile
 
-== Misc ==
-- SourceTree Windows specific
-Choose <OpenSSH> and <check out as it> options
+== Prerequisites ==
+Little Circule requires a web server, Node.js and Google App Engine.
 
-- favicon generator
-http://www.favicon.cc/
+== Web Server ==
+Nginx or Apache are supported.
+
+== Node.js Prerequisites ==
+In the command prompt or terminal:
+$ cd <project folder>
+$ npm install
+It will install the required Node.js packages.
 
 == Google App Engine Prerequisites ==
-
-Image Library PIL is required to run Google App Engine in local (dev) mode.
+Python 2.7.x 32-bit and Imaging Library (PIL) is required to run Google App Engine in local (development) mode.
 
 - How to download PIL in Windows
 1. Install Python 2.7.x 32-bit (64-bit won't work)
@@ -77,25 +81,32 @@ Image Library PIL is required to run Google App Engine in local (dev) mode.
 
 - How to build PIL in Mac OSX
 [Method 1]
+In the terminal:
 $ sudo -s
 # easy_install install pip
 # ARCHFLAGS=-Wno-error=unused-command-line-argument-hard-error-in-future pip install pil --allow-external pil --allow-unverified pil
 
 [Method 2]
 1. install brew
-2. brew install libjpeg
+   $ ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)"
+2. install libjpeg
+   $ brew install libjpeg
 3. download PIL http://www.pythonware.com/products/pil/
 4. edit setup.py in PIL
 - JPEG_ROOT = None
 + JPEG_ROOT = libinclude("/usr/local/Cellar/jpeg/8d")
-5. python setup.py build
-6. sudo python setup.py install
+5. $ python setup.py build
+6. $ sudo python setup.py install
 
 == Run the project locally ==
+In order to run the project in local machine (development mode), a web server (for example, Nginx or Apache), Node.js, Python, Python Imaging Library (PIL) and Google App Engine SDK are needed.
 
-1. Change aboutme.redirectme.net to 127.0.0.1
+1. Change littlecircle.redirectme.net to 127.0.0.1
 Win: edit C:\Windows\System32\drivers\etc\hosts
+> notepad C:\Windows\System32\drivers\etc\hosts
+
 OSX: edit /etc/hosts
+$ sudo nano /etc/hosts
 
 2. Start Nginx or Apache with preconfigured before
 
@@ -104,13 +115,28 @@ Win: C:\Python27\python "C:\Program Files (x86)\Google\google_appengine\dev_apps
 OSX: python /usr/local/google_appengine/dev_appserver.py --skip_sdk_update_check=yes --port=8080 --admin_port=8000 --log_level=debug <your iems5718-server path>/gapp
 
 4. Start node.js
-node littlecircle.js OR npm start
+> node littlecircle.js 
+OR 
+$ npm start
 
 == Deploy to production ==
+1. Deploy Google App Engine
+Win: C:\Python27\python "C:\Program Files (x86)\Google\google_appengine\appcfg.py" --no_cookies --skip_sdk_update_check --email=<your email> --passin update <your iems5718-server path>\gapp
+OSX: python /usr/local/google_appengine/appcfg.py --no_cookies --skip_sdk_update_check --email=<your email> --passin update <your iems5718-server path>/gapp
 
-[Deploy Google App Engine]
-C:\Python27\python "C:\Program Files (x86)\Google\google_appengine\appcfg.py" --no_cookies --skip_sdk_update_check --email=<your email> --passin update <your iems5718-server path>\gapp
+2. Server Update
+SSH login to the server and change to the <iems5718-server path>
+$ git reset --hard
+$ git pull origin master
+$ sudo service littlecircle restart
 
-== Self-build Chromium ==
+== Misc ==
+- SourceTree Windows specific
+Choose <OpenSSH> and <check out as it> options
+
+- favicon generator
+http://www.favicon.cc/
+
+- Self-build Chromium
 Win: http://my.no-ip.info/carlos/pub/Chrome-36.0.1918.0.zip
 OSX: http://my.no-ip.info/carlos/pub/Chrome-36.0.1918.0.dmg
