@@ -24,3 +24,12 @@ def geo_to_string(geo):
     if (geo is None):
         return ''
     return "{},{}".format(geo.lat, geo.lon)
+
+def get_rotate(orientation):
+    if (orientation == 3):
+        return 180
+    if (orientation == 6):
+        return 90
+    if (orientation == 8):
+        return 270
+    return 0

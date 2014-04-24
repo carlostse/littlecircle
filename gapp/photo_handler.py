@@ -74,18 +74,18 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         elif ('GPSLatitude' in meta and 'GPSLongitude' in meta):
             loc = ndb.GeoPt(meta['GPSLatitude'], meta['GPSLongitude'])
 
-        # orientation
+        # orientation, default is 1
         orientation = 1
         if ('Orientation' in meta):
             orientation = meta['Orientation']
 
-        if (orientation == 3):
-            logging.info("[UploadHandler] rotate 180")
-            img.rotate(180)
-            ''' Due to GAE's limitation, parse_source_metadata will only be done in execute_transforms
-                it makes preview is generated before img.rotate, therefore, we need to rotate it.
-                But no need to parse_source_metadata again '''
-            preview = img.execute_transforms(output_encoding=images.JPEG, quality=LITTLECIRCLE_IMG_Q, parse_source_metadata=False)
+        rotate = core_util.get_rotate(orientation)
+        logging.info("[UploadHandler] rotate {}".format(rotate))
+        img.rotate(rotate)
+        ''' Due to GAE's limitation, parse_source_metadata will only be done in execute_transforms
+            it makes preview is generated before img.rotate, therefore, we need to rotate it.
+            But no need to parse_source_metadata again '''
+        preview = img.execute_transforms(output_encoding=images.JPEG, quality=LITTLECIRCLE_IMG_Q, parse_source_metadata=False)
 
         # summary
         logging.info("[UploadHandler] photo taken at {} in location {}, orientation: {}".format(dt, loc, orientation))
@@ -177,15 +177,13 @@ class ImageViewHandler(webapp2.RequestHandler):
 #           logging.info("[ImageViewHandler] orientation: {}".format(img.ori))
 #           self.redirect("/download/{}?ori={}".format(blob_key, img.ori))
 
-            rotate = 0
             orientation = img.ori
             logging.debug("[ImageViewHandler] orientation: {}".format(orientation))
+            rotate = core_util.get_rotate(orientation)
 
-            if orientation == 3:
-                logging.info("[ImageViewHandler] rotate image")
-                rotate = 180
-
+            logging.info("[ImageViewHandler] rotate image {}".format(rotate))
             fullImg.rotate(rotate)
+
             self.response.headers['Content-Type'] = 'image/jpeg'
             self.response.out.write(fullImg.execute_transforms(output_encoding=images.JPEG, quality=LITTLECIRCLE_IMG_Q))
 
