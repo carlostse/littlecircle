@@ -158,17 +158,36 @@ class ImageViewHandler(webapp2.RequestHandler):
         size = self.request.get('size')
         logging.info("[ImageViewHandler] key: {} size: {}".format(blob_key, size))
 
-        # get the stored photo
+        # get the stored photo record (not the image)
         img = ndb.Key(littlecircle.Photo, blob_key).get()
         if (img is None):
-            logging.error("[ImageViewHandler] cannot find image: {}".format(blob_key))
+            logging.error("[ImageViewHandler] cannot find image record: {}".format(blob_key))
+            self.error(404)
+            return
+
+        # get the full image
+        fullImg = images.Image(blob_key=blob_key)
+        if (fullImg is None):
+            logging.error("[ImageViewHandler] cannot find full image: {}".format(blob_key))
             self.error(404)
             return
 
         if size == '2':
             logging.info("[ImageViewHandler] send full: {}".format(blob_key))
-            logging.info("[ImageViewHandler] orientation: {}".format(img.ori))
-            self.redirect("/download/{}?ori={}".format(blob_key, img.ori))
+#           logging.info("[ImageViewHandler] orientation: {}".format(img.ori))
+#           self.redirect("/download/{}?ori={}".format(blob_key, img.ori))
+
+            rotate = 0
+            orientation = img.ori
+            logging.debug("[ImageViewHandler] orientation: {}".format(orientation))
+
+            if orientation == 3:
+                logging.info("[ImageViewHandler] rotate image")
+                rotate = 180
+
+            fullImg.rotate(rotate)
+            self.response.headers['Content-Type'] = 'image/jpeg'
+            self.response.out.write(fullImg.execute_transforms(output_encoding=images.JPEG, quality=LITTLECIRCLE_IMG_Q))
 
         elif size == '1':
             logging.info("[ImageViewHandler] send preview")
@@ -177,7 +196,6 @@ class ImageViewHandler(webapp2.RequestHandler):
                 preview = img.preview
                 if (preview is None):
                     logging.info("[ImageViewHandler] preview not found, try to make it")
-                    fullImg = images.Image(blob_key=blob_key)
                     fullImg.resize(width=LITTLECIRCLE_PREVIEW_W)
                     preview = fullImg.execute_transforms(output_encoding=images.JPEG, quality=LITTLECIRCLE_IMG_Q)
                     if (preview is None):
@@ -200,7 +218,6 @@ class ImageViewHandler(webapp2.RequestHandler):
                 thumbnail = img.thumbnail
                 if (thumbnail is None):
                     logging.info("[ImageViewHandler] thumbnail not found, try to make it")
-                    fullImg = images.Image(blob_key=blob_key)
                     fullImg.resize(width=LITTLECIRCLE_THUMBNAIL_W)
                     thumbnail = fullImg.execute_transforms(output_encoding=images.JPEG, quality=LITTLECIRCLE_IMG_Q)
                     if (thumbnail is None):
@@ -216,7 +233,7 @@ class ImageViewHandler(webapp2.RequestHandler):
             except:
                 logging.error("[ImageViewHandler] except: {}".format(sys.exc_info()))
                 self.error(404)
-
+'''
 class ImageDownloadHandler(webapp2.RequestHandler): #blobstore_handlers.BlobstoreDownloadHandler
     def get(self, resource):
         resource = str(urllib.unquote(resource))
@@ -237,7 +254,7 @@ class ImageDownloadHandler(webapp2.RequestHandler): #blobstore_handlers.Blobstor
 
         img = images.Image(blob_key=blob_info)
         if orientation == '3':
-            logging.info("[ImageDownloadHandler] roate image")
+            logging.info("[ImageDownloadHandler] rotate image")
             rotate = 180
 
         size = blob_info.size
@@ -247,7 +264,7 @@ class ImageDownloadHandler(webapp2.RequestHandler): #blobstore_handlers.Blobstor
         img.rotate(rotate)
         self.response.headers['Content-Type'] = 'image/jpeg'
         self.response.out.write(img.execute_transforms(output_encoding=images.JPEG, quality=LITTLECIRCLE_IMG_Q))
-
+'''
 class ImageDeleteHandler(webapp2.RequestHandler):
     def get(self, url_sid, url_photo):
         # get the photo ID

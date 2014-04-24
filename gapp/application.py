@@ -12,6 +12,6 @@ app = webapp2.WSGIApplication([
     ('/upload', photo_handler.UploadHandler),
     ('/search/([^/]+)', photo_handler.ImageSearchHandler),
     ('/view', photo_handler.ImageViewHandler),
-    ('/download/([^/]+)', photo_handler.ImageDownloadHandler),
+#   ('/download/([^/]+)', photo_handler.ImageDownloadHandler),
     ('/delete/([^/]+)/([^/]+)', photo_handler.ImageDeleteHandler)
 ], debug=True)
