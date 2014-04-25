@@ -15,7 +15,9 @@ from google.appengine.api import images
 import littlecircle
 
 LITTLECIRCLE_THUMBNAIL_W=200
+LITTLECIRCLE_THUMBNAIL_H=LITTLECIRCLE_THUMBNAIL_W*3/4
 LITTLECIRCLE_PREVIEW_W=LITTLECIRCLE_THUMBNAIL_W*2
+LITTLECIRCLE_PREVIEW_H=LITTLECIRCLE_THUMBNAIL_H*2
 LITTLECIRCLE_IMG_Q=90
 
 class UploadUrlHandler(webapp2.RequestHandler):
@@ -31,14 +33,14 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         # check user login
         sid = self.request.get('sid')
         login = littlecircle.Login.get_by_sid(sid)
-        if (login is None or login.is_valid() == False):
+        if login is None or login.is_valid() == False:
             logging.error("[UploadHandler] invalid session id: {}".format(sid))
             self.error(401)
             return
 
         # check user exists
         user = login.user.get()
-        if (user is None):
+        if user is None:
             logging.error("[UploadHandler] cannot get user, sid: {}".format(sid))
             self.error(401)
             return
@@ -51,7 +53,12 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
 
         # make preview
         img = images.Image(blob_key=blob_key)
-        img.resize(width=LITTLECIRCLE_PREVIEW_W)
+        ''' https://developers.google.com/appengine/docs/python/images/imageclass?csw=1#Image_resize
+        The resize transform preserves the aspect ratio of the image. 
+        If both the width and the height arguments are provided, the transform uses the dimension that results in a smaller image
+        '''
+        img.resize(width=LITTLECIRCLE_PREVIEW_W, height=LITTLECIRCLE_PREVIEW_H)
+
         preview = img.execute_transforms(output_encoding=images.JPEG, quality=LITTLECIRCLE_IMG_Q, parse_source_metadata=True)
 
         # try to get geo location and date time of the photo
@@ -62,21 +69,21 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
 
         # date time
         dt = None
-        if (dev == True):
+        if dev == True:
             dt = datetime.datetime.now()
         elif ('DateTime' in meta):
             dt = core_util.exif_datetime_to_datetime(meta['DateTime'])
 
         # location
         loc = None
-        if (dev == True):
+        if dev == True:
             loc = ndb.GeoPt(22.4182277, 114.2080536) # The Chinese University of Hong Kong
         elif ('GPSLatitude' in meta and 'GPSLongitude' in meta):
             loc = ndb.GeoPt(meta['GPSLatitude'], meta['GPSLongitude'])
 
         # orientation, default is 1
         orientation = 1
-        if ('Orientation' in meta):
+        if 'Orientation' in meta:
             orientation = meta['Orientation']
 
         rotate = core_util.get_rotate(orientation)
@@ -91,7 +98,12 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         logging.info("[UploadHandler] photo taken at {} in location {}, orientation: {}".format(dt, loc, orientation))
 
         # make thumbnail
-        img.resize(width=LITTLECIRCLE_THUMBNAIL_W)
+        ''' https://developers.google.com/appengine/docs/python/images/imageclass?csw=1#Image_resize
+        The resize transform preserves the aspect ratio of the image. 
+        If both the width and the height arguments are provided, the transform uses the dimension that results in a smaller image
+        '''
+        logging.info("[UploadHandler] thumb: {} x {}".format(LITTLECIRCLE_THUMBNAIL_W, LITTLECIRCLE_THUMBNAIL_H))
+        img.resize(width=LITTLECIRCLE_THUMBNAIL_W, height=LITTLECIRCLE_THUMBNAIL_H)
         thumb = img.execute_transforms(output_encoding=images.JPEG, quality=LITTLECIRCLE_IMG_Q)
 
         # save photo information

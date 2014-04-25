@@ -560,7 +560,8 @@ aboutme = {
         firstAffected: -1,
         secondAffected: -1,
         numOfPhotoPerRow: 4,
-        originalWidth: 200,
+//      originalWidth: 200,
+        originalHeight: 150,
         uploaded: 1,
         removed: 2,
         large: false,
@@ -747,6 +748,7 @@ aboutme = {
             aboutme.photo.initFancyBox('showmap', i, 'iframe');
         },
         confirmRemove: function(i){
+            console.log('[confirmRemove] index: ' + i + ', total: ' + aboutme.photo.list.length);
             $('div.information').css('display', 'inline');
             var box = $('div.information-dialog')
               , btn1 = $('input.button1')
@@ -837,15 +839,16 @@ util = {
 //      console.log('[resize] type: ' + type + ', i: ' + i);
         var img = $(x)
           , large = type == 1 || i == aboutme.photo.selectedIndex
-          , w = large? aboutme.photo.originalWidth * 1.05: aboutme.photo.originalWidth
+        //, w = large? aboutme.photo.originalWidth * 1.05: aboutme.photo.originalWidth
+          , h = large? aboutme.photo.originalHeight * 1.05: aboutme.photo.originalHeight
           , r = large? 10: 20;
         if (i == aboutme.photo.selectedIndex) {
-            w *= 2;
+            h *= 2;
             r *= 2.2;
             r += 2; // small adjustment
         }
-        img.css('height', 'auto');
-        img.css('width', w + 'px');
+        img.css('height', h + 'px');
+        img.css('width', 'auto');
         // find the for the corresponding label and set right of it
         // $('div.' + img.attr('id').replace('img_', 'blackbg_')).css('right', r + 'px');
         // show or hide label
