@@ -628,7 +628,7 @@ aboutme = {
             $('button.map_' + i).animate({opacity: 0}, "slow");
             $('button.group_' + i).animate({opacity: 0}, "slow");
             $('#img_' + i).fadeTo("slow", 1);
-            $('#img_' + i).css("z-index", "2");
+            //$('#img_' + i).css("z-index", "2");
             $('div.date_' + i).fadeTo("slow", 0);
             $('img.enlarge_' + i).fadeTo("slow", 0);
             $('img.delete_' + i).fadeTo("slow", 0);
@@ -638,7 +638,7 @@ aboutme = {
                 $('button.group_' + i).animate({opacity: 1}, "slow");
                 //$('#img_' + i).fadeTo("slow", 0.4);
                 $('#img_' + i).toggleClass("imgblur");
-                $('#img_' + i).css("z-index", "0");
+                //$('#img_' + i).css("z-index", "0");
                 $('div.date_' + i).fadeTo("slow", 1);
                 $('img.enlarge_' + i).fadeTo("slow", 1);
                 $('img.delete_' + i).fadeTo("slow", 1);
@@ -649,7 +649,7 @@ aboutme = {
                 $('button.group_' + i).animate({opacity: 0}, "slow");
                 //$('#img_' + i).fadeTo("slow", 1);
                 $('#img_' + i).toggleClass("imgblur");
-                $('#img_' + i).css("z-index", "2");
+                //$('#img_' + i).css("z-index", "2");
                 $('div.date_' + i).fadeTo("slow", 0);
                 $('img.enlarge_' + i).fadeTo("slow", 0);
                 $('img.delete_' + i).fadeTo("slow", 0);
@@ -811,21 +811,21 @@ aboutme = {
         }
     },
     string: {
-            // alert messages
-            ok: 'OK',
-            yes: 'Yes',
-            no: 'No',
-//          confirm_upload: 'Are you sure?',
-            confirm_remove: 'Are you sure to remove this photo?',
-            upload_successfully: 'Upload Successfully',
-            remove_successfully: 'Remove Successfully',
-            // web socket
-            change_cover_photo: ' changed the cover photo',
-            uploaded_photo: ' uploaded a new photo',
-            removed_photo: ' removed a photo',
-            // interface
-            map: 'Map',
-            expand: 'Expand'
+        // alert messages
+        ok: 'OK',
+        yes: 'Yes',
+        no: 'No',
+//      confirm_upload: 'Are you sure?',
+        confirm_remove: 'Are you sure to remove this photo?',
+        upload_successfully: 'Upload Successfully',
+        remove_successfully: 'Remove Successfully',
+        // web socket
+        change_cover_photo: ' changed the cover photo',
+        uploaded_photo: ' uploaded a new photo',
+        removed_photo: ' removed a photo',
+        // interface
+        map: 'Map',
+        expand: 'Expand'
     }
 },
 util = {
