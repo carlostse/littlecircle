@@ -586,7 +586,7 @@ aboutme = {
 //              (o.geo? ' / <a id="map_' + i + '" href="/app/map/' + o.geo + '">show map</a>': '') +
 //          '</div>';
             return '<a id="image_' + i + '" href="' + links[0] + '"><img src="/img/enlarge01.png" alt="enlarge" class="enlarge enlarge_' + i + '"></a>' +
-            (o.isOwner? '<img src="/img/delete01.png" alt="delete" class="delete delete_' + i + '" onclick="aboutme.photo.confirmRemove(' + i + ')">': '') +
+            (o.isOwner? '<img src="/img/delete01.png" alt="delete" class="delete delete_' + i + '" onclick="aboutme.photo.confirmRemove(\'' + o.pkey + '\')">': '') +
             links[1] +
             (o.geo? '<a id="showmap_' + i + '" href="/app/map/' + o.geo + '"><button class="map map_' + i + '">' + aboutme.string.map + '</button></a>': '') +
             (i > 0? '<button class="group group_' + i + '" onclick="aboutme.photo.click(' + i + ');">' + aboutme.string.expand + '</button>': '') +
@@ -596,6 +596,15 @@ aboutme = {
             return  '<td ' + (i == aboutme.photo.selectedIndex? 'colspan="2" rowspan="2"': '') + '>' +
                         '<div class="photo photo_' + i + '">' + aboutme.photo.getPhotoFrame(o, i) + '</div>' +
                     '</td>';
+        },
+        getPhotoIndex: function(pkey){
+            for (var i = 0; i < aboutme.photo.list.length; i++){
+//              console.log('[getPhotoIndex] (' + i + ') ' + aboutme.photo.list[i].pkey + ' vs ' + pkey);
+                if (aboutme.photo.list[i].pkey == pkey)
+                    return i;
+            }
+            console.log('[getPhotoIndex] cannot find ' + pkey);
+            return -1;
         },
         search: function(){
             if (!aboutme.user.sid || aboutme.user.sid < 1)
@@ -747,8 +756,13 @@ aboutme = {
             aboutme.photo.initFancyBox('showmap', 0, 'iframe');
             aboutme.photo.initFancyBox('showmap', i, 'iframe');
         },
-        confirmRemove: function(i){
-            console.log('[confirmRemove] index: ' + i + ', total: ' + aboutme.photo.list.length);
+        confirmRemove: function(pkey){
+            var i = aboutme.photo.getPhotoIndex(pkey);
+            console.log('[confirmRemove] ' + pkey + ', idx: ' + i);
+            if (i < 0){
+                return;
+            }
+                
             $('div.information').css('display', 'inline');
             var box = $('div.information-dialog')
               , btn1 = $('input.button1')
@@ -758,7 +772,7 @@ aboutme = {
             box.html(aboutme.string.confirm_remove);
 
             btn1.click(function(){
-                infoBtn(aboutme.photo.remove(i));
+                infoBtn(aboutme.photo.remove(i, pkey));
             });
             btn1.prop('value', aboutme.string.yes);
             btn1.css('display', 'inline');
@@ -769,9 +783,8 @@ aboutme = {
             });
             btn2.css('display', 'inline');
         },
-        remove: function(i){
-            var pkey = aboutme.photo.list[i].pkey;
-            console.log('[remove] photo: ' + pkey);
+        remove: function(i, pkey){
+            console.log('[remove] (' + i + ') photo: ' + pkey);
             $.ajax({
                 type: "GET",
                 url: aboutme.path.photo_delete + '/' + aboutme.user.sid + '/' + pkey
@@ -887,5 +900,7 @@ function alert(messages){
 }
 function infoBtn(callback){
     $('div.information').css('display', 'none');
-    if (callback) callback();
+    $('input.button1').unbind("click");
+    $('input.button2').unbind("click");
+    if (callback) callback;
 };

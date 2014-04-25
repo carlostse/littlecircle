@@ -304,7 +304,7 @@ class ImageDeleteHandler(webapp2.RequestHandler):
         logging.info("[ImageDeleteHandler] owner: {}, login: {}".format(k1.id(), k2.id()))
         if (k1 != k2):
             logging.info("[ImageDeleteHandler] permission denied, image: {}".format(blob_key))
-            self.error(550) # permission denied
+            self.error(403)
             return
 
         # delete photo (set inactive)
