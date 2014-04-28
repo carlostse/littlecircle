@@ -8,6 +8,11 @@ exports.log = function(ftn, msg){
     log(ftn, msg);
 }
 
+exports.escape = function(str){
+    return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;')
+              .replace(/</g, '&lt;').replace(/>/g, '&gt;');
+};
+
 /*
  * GET map page.
  */

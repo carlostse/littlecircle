@@ -28,9 +28,6 @@ routes.log('main', 'Start in ' + mode + ' mode');
 
 app.get('/map/:geo', routes.map);
 
-var io = require('socket.io').listen(app.listen(port), {log: false});
-routes.log('main', 'Express server listening on port ' + port);
-
 var online = {
     users: [],
     addUser: function(name) {
@@ -41,7 +38,8 @@ var online = {
         }
         online.users.push(name);
     }
-};
+} , io = require('socket.io').listen(app.listen(port), {log: false});
+routes.log('main', 'Express server listening on port ' + port);
 
 io.sockets.on('connection', function (socket) {
     routes.log('io.sockets', 'socket connected');
@@ -57,7 +55,11 @@ io.sockets.on('connection', function (socket) {
     socket.on('chat', function(data) {
         routes.log('io.sockets', 'chat: ' + JSON.stringify(data));
         if (data && data.user && data.message)
-            io.sockets.emit('message', JSON.stringify({time: moment().format('HH:mm:ss'), user: data.user.name, message: data.message}));
+            io.sockets.emit('message', JSON.stringify({
+                time: moment().format('HH:mm:ss'), 
+                user: data.user.name, 
+                message: routes.escape(data.message)
+            }));
     });
     socket.on('photo', function(data) {
         routes.log('io.sockets', 'photo: ' + JSON.stringify(data));
